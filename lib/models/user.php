@@ -3,6 +3,7 @@
 
 namespace Bx\Model\Models;
 
+use Bx\Model\AbsOptimizedModel;
 
 class User extends AbsOptimizedModel
 {
@@ -20,31 +21,31 @@ class User extends AbsOptimizedModel
 
     public function getId(): int
     {
-        return (int)$this['id'];
+        return (int)$this['ID'];
     }
 
     public function getName(): string
     {
-        return (string)$this['name'];
+        return (string)$this['NAME'];
     }
 
     public function getLastName(): string
     {
-        return (string)$this['last_name'];
+        return (string)$this['LAST_NAME'];
     }
 
     public function getSecondName(): string
     {
-        return (string)$this['second_name'];
+        return (string)$this['SECOND_NAME'];
     }
 
     public function getEmail(): string
     {
-        return (string)$this['email'];
+        return (string)$this['EMAIL'];
     }
 
     public function getPhone(): string
     {
-        return (string)$this['phone'];
+        return (string)$this['PERSONAL_PHONE'];
     }
 }
