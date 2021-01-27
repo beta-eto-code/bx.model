@@ -22,6 +22,11 @@ class ModelCollection implements IteratorAggregate, Countable
     {
         $this->className = $className;
         foreach ($list as $item) {
+            if ($item instanceof $className) {
+                $this->list[] = $item;
+                continue;
+            }
+
             $this->list[] = new $className($item);
         }
     }

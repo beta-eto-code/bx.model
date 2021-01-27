@@ -45,10 +45,10 @@ trait FilterableHelper
                 $key = str_replace('like_', '', $key);
             }
 
-            if (strpos('date_', $key) === 0) {
+            if (strpos($key, 'date_') === 0) {
                 $value = new Date($value, 'Y-m-d');
                 $key = str_replace('date_', '', $key);
-            } elseif (strpos('datetime_', $key) === 0) {
+            } elseif (strpos($key, 'datetime_') === 0) {
                 $value = new DateTime($value, 'Y-m-d\TH:i:s\Z');
                 $key = str_replace('datetime_', '', $key);
             }
