@@ -70,14 +70,23 @@ class ModelCollection implements IteratorAggregate, Countable
 
     /**
      * @param string $fieldName
+     * @param string|null $keyFieldName
      * @return array
      */
-    public function column(string $fieldName): array
+    public function column(string $fieldName, string $keyFieldName = null): array
     {
         $result = [];
         foreach ($this->list as $item) {
+            $key = null;
+            if (!empty($keyFieldName) && isset($item[$keyFieldName])) {
+                $key = $item[$keyFieldName];
+            }
             if (isset($item[$fieldName])) {
-                $result[] = $item[$fieldName];
+                if (!empty($key)) {
+                    $result[$key] = $item[$fieldName];
+                } else {
+                    $result[] = $item[$fieldName];
+                }
             }
         }
 

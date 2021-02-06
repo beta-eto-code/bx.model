@@ -123,7 +123,8 @@ class FileService extends BaseModelService
             return $result->addError(new Error('Файл не найден', 404));
         }
 
-        return FileTable::delete($id);
+        CFile::Delete($id);
+        return new Result();
     }
 
     /**
@@ -165,7 +166,9 @@ class FileService extends BaseModelService
         }
 
         return $this->getList([
-            '=ID' => $fileIdList
+            'filter' => [
+                '=ID' => $fileIdList,
+            ],
         ]);
     }
 }
