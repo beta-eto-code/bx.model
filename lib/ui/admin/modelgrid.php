@@ -10,6 +10,7 @@ use Bitrix\Main\UI\PageNavigation;
 use Bx\Model\AbsOptimizedModel;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\ModelServiceInterface;
+use Bx\Model\Interfaces\UserContextInterface;
 use Bx\Model\ModelCollection;
 use Bx\Model\Services\ProxyService;
 use Bitrix\Main\HttpRequest;
@@ -125,6 +126,14 @@ class ModelGrid
      * @var \Bitrix\Main\Grid\Options
      */
     private $options;
+    /**
+     * @var array
+     */
+    private $defaultFilter;
+    /**
+     * @var UserContextInterface
+     */
+    private $userContext;
 
     public function __construct(ModelServiceInterface $modelService, string $code, string $primaryKey = 'ID')
     {
@@ -170,6 +179,22 @@ class ModelGrid
         }
 
         $this->columnList[$id] = new GridColumn($id, $title, $sort, $isDefault);
+    }
+
+    /**
+     * @param array $filter
+     */
+    public function setFilter(array $filter)
+    {
+        $this->defaultFilter = $filter;
+    }
+
+    /**
+     * @param UserContextInterface $userContext
+     */
+    public function setUserContext(UserContextInterface $userContext)
+    {
+        $this->userContext = $userContext;
     }
 
     /**
@@ -307,6 +332,10 @@ class ModelGrid
             }
         }
 
+        if (!empty($this->defaultFilter)) {
+            $result = array_merge($this->defaultFilter, $result);
+        }
+
         return $result;
     }
 
@@ -368,7 +397,7 @@ class ModelGrid
             return $this->query;
         }
 
-        return $this->query = $this->modelService->query()
+        return $this->query = $this->modelService->query($this->userContext ?? null)
             ->loadSort($this->getSort())
             ->loadFiler($this->getFilterData())
             ->setLimit($this->nav->getPageSize())

@@ -15,26 +15,22 @@ class GroupAction extends BaseAction
      */
     public function toArray(): array
     {
-        $jsAction = $this->helper->groupAction('POST', $this->action);
-
-        if ($this->useConfirm === true) {
-            $onchange = new Onchange();
-            $onchange->addAction(
-                [
-                    'ACTION' => Actions::CALLBACK,
-                    'CONFIRM' => true,
-                    'CONFIRM_APPLY_BUTTON'  => $this->confirmBtn,
-                    'DATA' => [
-                        [
-                            'JS' => !empty($this->jsString) ?
-                                $this->jsString :
-                                $this->helper->groupAction('POST', $this->action)
-                        ]
+        $onchange = new Onchange();
+        $onchange->addAction(
+            [
+                'ACTION' => Actions::CALLBACK,
+                'CONFIRM' => $this->useConfirm,
+                'CONFIRM_APPLY_BUTTON'  => $this->confirmBtn ?? '',
+                'DATA' => [
+                    [
+                        'JS' => !empty($this->jsString) ?
+                            $this->jsString :
+                            $this->helper->groupAction('POST', $this->action)
                     ]
                 ]
-            );
-            $jsAction = $onchange->toArray();
-        }
+            ]
+        );
+        $jsAction = $onchange->toArray();
 
         return [
             'ID' => $this->action,
