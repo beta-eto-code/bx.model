@@ -10,6 +10,12 @@ use Bx\Model\Interfaces\Models\PaginationInterface;
 interface ModelQueryInterface
 {
     /**
+     * @param array $select
+     * @return $this
+     */
+    public function setSelect(array $select): self;
+
+    /**
      * Форимируем условия фильтра из переданных данных
      * @param array $params
      * @return $this

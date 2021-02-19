@@ -36,6 +36,10 @@ class QueryModel implements ModelQueryInterface
      * @var int
      */
     private $page = 1;
+    /**
+     * @var array
+     */
+    private $select;
 
     public function __construct(ModelServiceInterface $modelService, UserContextInterface $userContext = null)
     {
@@ -76,6 +80,10 @@ class QueryModel implements ModelQueryInterface
         if ($this->limit > 0) {
             $params['limit'] = $this->limit;
             $params['offset'] = $this->limit * ($this->page - 1);
+        }
+
+        if (!empty($this->select)) {
+            $params['select'] = $this->select;
         }
 
         return $this->modelService->getList($params, $this->userContext);
@@ -142,6 +150,12 @@ class QueryModel implements ModelQueryInterface
         $this->page = $this->modelService->getPage($params) ?? 1;
         $this->limit = $this->modelService->getLimit($params);
 
+        return $this;
+    }
+
+    public function setSelect(array $select): ModelQueryInterface
+    {
+        $this->select = $select;
         return $this;
     }
 }
