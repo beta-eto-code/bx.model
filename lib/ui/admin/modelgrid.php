@@ -332,10 +332,6 @@ class ModelGrid
             }
         }
 
-        if (!empty($this->defaultFilter)) {
-            $result = array_merge($this->defaultFilter, $result);
-        }
-
         return $result;
     }
 
@@ -397,11 +393,17 @@ class ModelGrid
             return $this->query;
         }
 
-        return $this->query = $this->modelService->query($this->userContext ?? null)
+        $this->query = $this->modelService->query($this->userContext ?? null)
             ->loadSort($this->getSort())
             ->loadFiler($this->getFilterData())
             ->setLimit($this->nav->getPageSize())
             ->setPage($this->nav->getCurrentPage());
+
+        if (!empty($this->defaultFilter)) {
+            $this->query->addFilter($this->defaultFilter);
+        }
+
+        return $this->query;
     }
 
     /**

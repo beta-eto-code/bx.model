@@ -73,8 +73,8 @@ class QueryModel implements ModelQueryInterface
     public function getList(): ModelCollection
     {
         $params = [
-            'filter' => $this->filter,
-            'order' => $this->sort
+            'filter' => $this->filter ?? [],
+            'order' => $this->sort ?? [],
         ];
 
         if ($this->limit > 0) {
@@ -143,6 +143,43 @@ class QueryModel implements ModelQueryInterface
     }
 
     /**
+     * @param array $filter
+     * @param string|null $prefix
+     * @return ModelQueryInterface
+     */
+    public function addFilter(array $filter, string $prefix = null): ModelQueryInterface
+    {
+        if (is_null($prefix)) {
+            $this->filter = array_merge($this->filter ?? [], $filter);
+            return $this;
+        }
+
+        $newFilter = [];
+        foreach ($filter as $key => $value) {
+            $newKey = $key;
+            if (strpos($key, '=') === 0) {
+                $newKey = "={$prefix}.".substr_replace($key, '', 0, 1);
+            } elseif (strpos($key, '>=') === 0) {
+                $newKey = ">={$prefix}.".substr_replace($key, '', 0, 2);
+            } elseif (strpos($key, '<=') === 0) {
+                $newKey = "<={$prefix}.".substr_replace($key, '', 0, 2);
+            } elseif (strpos($key, '<>') === 0) {
+                $newKey = "<>{$prefix}.".substr_replace($key, '', 0, 2);
+            } elseif (strpos($key, '!') === 0) {
+                $newKey = "!{$prefix}.".substr_replace($key, '', 0, 1);
+            } elseif (strpos($key, '%') === 0) {
+                $newKey = "%{$prefix}.".substr_replace($key, '', 0, 1);
+            }
+
+            $newFilter[$newKey] = $value;
+        }
+
+        $this->filter = array_merge($this->filter ?? [], $newFilter);
+
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function loadPagination(array $params): ModelQueryInterface
@@ -157,5 +194,21 @@ class QueryModel implements ModelQueryInterface
     {
         $this->select = $select;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilter(): array
+    {
+        return $this->filter ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getSort(): array
+    {
+        return $this->sort ?? [];
     }
 }

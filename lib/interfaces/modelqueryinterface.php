@@ -56,11 +56,30 @@ interface ModelQueryInterface
     public function setLimit(int $limit): self;
 
     /**
+     * @param array $filter
+     * @param string|null $prefix
+     * @return $this
+     */
+    public function addFilter(array $filter, string $prefix = null): self;
+
+    /**
      * Указываем текущу страницу (работает совместно с максимальным количеством элементов)
      * @param int $page
      * @return $this
      */
     public function setPage(int $page): self;
+
+    /**
+     * Текущий фильтр
+     * @return array
+     */
+    public function getFilter(): array;
+
+    /**
+     * Текущая сортировка
+     * @return array
+     */
+    public function getSort(): array;
 
     /**
      * @return int
