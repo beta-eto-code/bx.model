@@ -65,36 +65,6 @@ abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate
         }
     }
 
-    /**
-     * @param string $prefix
-     * @param array $list
-     * @return string[]
-     */
-    protected static function addPrefix(string $prefix, array $list): array
-    {
-        foreach ($list as &$item) {
-            $item = $prefix.$item;
-        }
-
-        return $list;
-    }
-
-    protected static function prepareSelect(string $prefix, array $selectFields, array $replacePrefix): string
-    {
-        $result = [];
-        foreach ($selectFields as $key => $field) {
-            $iField = $field;
-            if (is_string($key)) {
-                $iField = $key;
-            }
-
-            $oField = strtolower(str_replace($replacePrefix, '', $iField));
-            $result[] = "{$prefix}.{$iField} as {$oField}";
-        }
-
-        return implode(', ', $result);
-    }
-
     public function getIterator()
     {
         return new ArrayIterator($this->data);
