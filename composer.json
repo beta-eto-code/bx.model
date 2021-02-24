@@ -1,0 +1,12 @@
+{
+    "name": "beta/bx.model",
+    "type": "bitrix-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Nesterov",
+            "email": "alex19pov31@gmail.com"
+        }
+    ],
+    "require": {}
+}
