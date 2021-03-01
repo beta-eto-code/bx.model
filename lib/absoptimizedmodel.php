@@ -31,7 +31,7 @@ abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate
         $result = $this->toArray();
         foreach ($result as &$value) {
             if ($value instanceof DateTime) {
-                $value = $value->format('Y-m-d\TH:i:s\Z');
+                $value = $value->format('c');
                 continue;
             }
             if ($value instanceof Date) {
