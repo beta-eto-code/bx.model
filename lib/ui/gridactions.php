@@ -37,7 +37,7 @@ class GridActions
     public function reloadTable(string $method, array $data): string
     {
         $data['grid_id'] = $this->code;
-        return $this->getInstance().".reloadTable('{$method}', ".json_encode($data).")";
+        return $this->getInstance().".reloadTableOnCurrentPage('{$method}', ".json_encode($data).")";
     }
 
     /**
