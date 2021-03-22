@@ -46,10 +46,10 @@ trait FilterableHelper
             }
 
             if (strpos($key, 'date_') === 0) {
-                $value = new Date($value, 'Y-m-d');
+                $value = (new Date($value, 'Y-m-d'))->format('Y-m-d');
                 $key = str_replace('date_', '', $key);
             } elseif (strpos($key, 'datetime_') === 0) {
-                $value = new DateTime($value, 'Y-m-d\TH:i:s\Z');
+                $value = (new DateTime($value, 'Y-m-d\TH:i:s\Z'))->format('Y-m-d H:i:s');
                 $key = str_replace('datetime_', '', $key);
             }
 
@@ -58,7 +58,11 @@ trait FilterableHelper
                     $key = $filterFields[$key];
                 }
 
-                $result[$prefix.$key] = explode(',', $value);
+                if (is_string($value)) {
+                    $result[$prefix.$key] = explode(',', $value);
+                } else {
+                    $result[$prefix.$key] = $value;
+                }
             }
         }
 
