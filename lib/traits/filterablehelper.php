@@ -4,8 +4,8 @@
 namespace Bx\Model\Traits;
 
 use Bitrix\Main\ObjectException;
-use Bitrix\Main\Type\Date;
-use Bitrix\Main\Type\DateTime;
+use Bx\Model\Helper\ExtendedDate;
+use Bx\Model\Helper\ExtendedDateTime;
 
 trait FilterableHelper
 {
@@ -46,10 +46,10 @@ trait FilterableHelper
             }
 
             if (strpos($key, 'date_') === 0) {
-                $value = (new Date($value, 'Y-m-d'))->format('Y-m-d');
+                $value = new ExtendedDate($value, 'Y-m-d');
                 $key = str_replace('date_', '', $key);
             } elseif (strpos($key, 'datetime_') === 0) {
-                $value = (new DateTime($value, 'Y-m-d\TH:i:s\Z'))->format('Y-m-d H:i:s');
+                $value = new ExtendedDateTime($value, 'Y-m-d\TH:i:s\Z');
                 $key = str_replace('datetime_', '', $key);
             }
 
@@ -59,10 +59,11 @@ trait FilterableHelper
                 }
 
                 if (is_string($value)) {
-                    $result[$prefix.$key] = explode(',', $value);
-                } else {
-                    $result[$prefix.$key] = $value;
+                    $valueList = explode(',', $value);
+                    $value = count($valueList) > 1 ? $valueList : $value;
                 }
+
+                $result[$prefix.$key] = $value;
             }
         }
 
