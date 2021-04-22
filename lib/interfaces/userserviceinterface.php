@@ -12,4 +12,14 @@ interface UserServiceInterface extends ModelServiceInterface
      * @return UserContextInterface|null
      */
     public function login(string $login, string $password): ?UserContextInterface;
+
+    /**
+     * @return bool
+     */
+    public function isAuthorized(): bool;
+
+    /**
+     * @return UserContextInterface|null
+     */
+    public function getCurrentUser(): ?UserContextInterface;
 }
