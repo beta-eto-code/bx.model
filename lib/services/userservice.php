@@ -201,4 +201,32 @@ class UserService extends BaseModelService implements UserServiceInterface
 
         return new UserContext($user);
     }
+
+    /**
+     * @return bool
+     */
+    public function isAuthorized(): bool
+    {
+        global $USER;
+        return (bool)($USER->IsAuthorized() ?? false);
+    }
+
+    /**
+     * @return UserContextInterface|null
+     */
+    public function getCurrentUser(): ?UserContextInterface
+    {
+        global $USER;
+        $userId = (int)$USER->GetID();
+        if (!$userId) {
+            return null;
+        }
+
+        $user = $this->getById($userId);
+        if (!($user instanceof User)) {
+            return null;
+        }
+
+        return new UserContext($user);
+    }
 }
