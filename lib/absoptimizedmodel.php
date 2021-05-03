@@ -24,6 +24,15 @@ abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate
     }
 
     /**
+     * @param string $key
+     * @return boolean
+     */
+    public function isFill(string $key): bool
+    {
+       return isset($this->data[$key]); 
+    }
+
+    /**
      * @return array
      */
     public function getApiModel(): array
