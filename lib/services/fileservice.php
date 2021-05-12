@@ -10,8 +10,9 @@ use Bx\Model\AbsOptimizedModel;
 use Bx\Model\ModelCollection;
 use Bitrix\Main\FileTable;
 use Bitrix\Main\Result;
-use Bx\Model\Interfaces\UserContextInterface;
 use Bx\Model\BaseModelService;
+use Bx\Model\Interfaces\UserContextInterface;
+use Bx\Model\Interfaces\FileServiceInterface;
 use Bx\Model\Models\File;
 use Bx\Model\Traits\FilterableHelper;
 use Bx\Model\Traits\LimiterHelper;
@@ -22,7 +23,7 @@ use Closure;
 use Psr\Http\Message\UploadedFileInterface;
 use Exception;
 
-class FileService extends BaseModelService
+class FileService extends BaseModelService implements FileServiceInterface
 {
     use FilterableHelper;
     use SortableHelper;
@@ -140,24 +141,13 @@ class FileService extends BaseModelService
 
     /**
      * @param string $baseDir
-     * @param UploadedFileInterface ...$files
+     * @param array ...$fileDataList
      * @return File[]|ModelCollection
-     * @throws ArgumentException
-     * @throws ObjectPropertyException
-     * @throws SystemException
      */
-    public function saveUploadFiles(string $baseDir, UploadedFileInterface ...$files): ModelCollection
+    private function internalSaveFiles(string $baseDir, array ...$fileDataList): ModelCollection
     {
         $fileIdList = [];
-        foreach ($files as $file) {
-            $data = [
-                'name' => $file->getClientFilename(),
-                'size' => $file->getSize(),
-                'tmp_name' => $file->getStream()->getMetadata('uri'),
-                'type' => $file->getClientMediaType(),
-                'MODULE_ID' => 'bx.model',
-            ];
-
+        foreach ($fileDataList as $data) {
             $fileIdList[] = (int) CFile::SaveFile($data, $baseDir);
         }
 
@@ -170,5 +160,59 @@ class FileService extends BaseModelService
                 '=ID' => $fileIdList,
             ],
         ]);
+    }
+
+    /**
+     * @param string $baseDir
+     * @param string ...$filePaths
+     * @return File[]|ModelCollection
+     */
+    public function saveFiles(string $baseDir, string ...$filePaths): ModelCollection
+    {
+        $fileDataList = [];
+        foreach ($filePaths as $path) {
+            $data = CFile::MakeFileArray($path);
+            if (empty($data)) {
+                continue;
+            }
+
+            $fileDataList[] = $data;
+        }
+
+        if (empty($fileDataList)) {
+            return new ModelCollection([], File::class);
+        }
+
+        return $this->internalSaveFiles($baseDir, ...$fileDataList);
+    }
+
+    /**
+     * @param string $baseDir
+     * @param UploadedFileInterface ...$files
+     * @return File[]|ModelCollection
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
+     */
+    public function saveUploadFiles(string $baseDir, UploadedFileInterface ...$files): ModelCollection
+    {
+        $fileDataList = [];
+        foreach ($files as $file) {
+            $data = [
+                'name' => $file->getClientFilename(),
+                'size' => $file->getSize(),
+                'tmp_name' => $file->getStream()->getMetadata('uri'),
+                'type' => $file->getClientMediaType(),
+                'MODULE_ID' => 'bx.model',
+            ];
+
+            $fileDataList[] = $data;
+        }
+
+        if (empty($fileDataList)) {
+            return new ModelCollection([], File::class);
+        }
+
+        return $this->internalSaveFiles($baseDir, ...$fileDataList);
     }
 }
