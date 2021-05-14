@@ -8,8 +8,9 @@ use Bitrix\Main\Type\Date;
 use Bitrix\Main\Type\DateTime;
 use IteratorAggregate;
 use ArrayIterator;
+use Bx\Model\Interfaces\CollectionItemInterface;
 
-abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate
+abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate, CollectionItemInterface
 {
     /**
      * @var array
@@ -25,11 +26,48 @@ abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate
 
     /**
      * @param string $key
+     * @param [type] $value
+     * @return boolean
+     */
+    public function assertValueByKey(string $key, $value): bool
+    {
+        return $this->hasValueKey($key) ? $this->getValueByKey($key) == $value : false;
+    }
+
+    /**
+     * @param string $key
+     * @return boolean
+     */
+    public function hasValueKey(string $key): bool
+    {
+        return isset($this->data[$key]);
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getValueByKey(string $key)
+    {
+        return $this->data[$key] ?? null;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->getApiModel();
+    }
+
+    /**
+     * @deprecated
+     * @param string $key
      * @return boolean
      */
     public function isFill(string $key): bool
     {
-       return isset($this->data[$key]); 
+       return $this->hasValueKey($key);
     }
 
     /**
@@ -54,12 +92,12 @@ abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate
 
     public function offsetExists($offset)
     {
-        return isset($this->data[$offset]);
+        return $this->hasValueKey($offset);
     }
 
     public function offsetGet($offset)
     {
-        return $this->data[$offset] ?? null;
+        return $this->getValueByKey($offset);
     }
 
     public function offsetSet($offset, $value)

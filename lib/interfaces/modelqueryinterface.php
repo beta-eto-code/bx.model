@@ -7,14 +7,8 @@ namespace Bx\Model\Interfaces;
 use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\Models\PaginationInterface;
 
-interface ModelQueryInterface
+interface ModelQueryInterface extends QueryInterface
 {
-    /**
-     * @param array $select
-     * @return $this
-     */
-    public function setSelect(array $select): self;
-
     /**
      * Форимируем условия фильтра из переданных данных
      * @param array $params
@@ -35,7 +29,12 @@ interface ModelQueryInterface
      * @return $this
      */
     public function loadPagination(array $params): self;
-
+    /**
+     * @param array $filter
+     * @param string|null $prefix
+     * @return $this
+     */
+    public function addFilter(array $filter, string $prefix = null): self;
     /**
      * Возвращает объект пагинации
      * @return PaginationInterface
@@ -49,57 +48,14 @@ interface ModelQueryInterface
     public function getListPaginationData(): array;
 
     /**
-     * Указываем максимальное количество элементов
-     * @param int $limit
-     * @return $this
-     */
-    public function setLimit(int $limit): self;
-
-    /**
-     * @param array $filter
-     * @param string|null $prefix
-     * @return $this
-     */
-    public function addFilter(array $filter, string $prefix = null): self;
-
-    /**
-     * Указываем текущу страницу (работает совместно с максимальным количеством элементов)
-     * @param int $page
-     * @return $this
-     */
-    public function setPage(int $page): self;
-
-    /**
      * Текущий фильтр
      * @return array
      */
     public function getFilter(): array;
 
     /**
-     * Текущая сортировка
-     * @return array
-     */
-    public function getSort(): array;
-
-    /**
-     * @return int
-     */
-    public function getLimit(): int;
-
-    /**
-     * @return int
-     */
-    public function getPage(): int;
-
-    /**
      * Список элементов
      * @return ModelCollection
      */
     public function getList(): ModelCollection;
-
-    /**
-     * Общее количество элементов
-     * @return int
-     */
-    public function getTotalCount(): int;
 }

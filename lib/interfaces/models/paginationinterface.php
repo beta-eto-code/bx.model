@@ -3,8 +3,9 @@
 
 namespace Bx\Model\Interfaces\Models;
 
+use JsonSerializable;
 
-interface PaginationInterface
+interface PaginationInterface extends JsonSerializable
 {
     /**
      * Номер страницы
