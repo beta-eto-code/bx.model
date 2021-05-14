@@ -8,6 +8,7 @@ use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\PaginationInterface;
 use Bx\Model\Interfaces\ModelServiceInterface;
+use Bx\Model\Interfaces\QueryInterface;
 use Bx\Model\Interfaces\UserContextInterface;
 
 class QueryModel implements ModelQueryInterface
@@ -40,6 +41,10 @@ class QueryModel implements ModelQueryInterface
      * @var array
      */
     private $select;
+    /**
+     * @var int
+     */
+    private $totalCount;
 
     public function __construct(ModelServiceInterface $modelService, UserContextInterface $userContext = null)
     {
@@ -79,7 +84,7 @@ class QueryModel implements ModelQueryInterface
 
         if ($this->limit > 0) {
             $params['limit'] = $this->limit;
-            $params['offset'] = $this->limit * ($this->page - 1);
+            $params['offset'] = $this->getOffset();
         }
 
         if (!empty($this->select)) {
@@ -100,23 +105,75 @@ class QueryModel implements ModelQueryInterface
         ];
     }
 
-    public function setLimit(int $limit): ModelQueryInterface
+    /**
+     * @param array $filter
+     * @return ModelQueryInterface
+     */
+    public function setFilter(array $filter): QueryInterface
+    {
+        $this->filter = $filter;
+        return $this;
+    }
+
+    /**
+     * @param integer $limit
+     * @return ModelQueryInterface
+     */
+    public function setLimit(int $limit): QueryInterface
     {
         $this->limit = $limit;
         return $this;
     }
 
-    public function setPage(int $page): ModelQueryInterface
+    /**
+     * @param integer $limit
+     * @return ModelQueryInterface
+     */
+    public function setSort(array $sort): QueryInterface
+    {
+        $this->sort = $sort;
+        return $this;
+    }
+
+    /**
+     * @param integer $limit
+     * @return ModelQueryInterface
+     */
+    public function setPage(int $page): QueryInterface
     {
         $this->page = $page;
         return $this;
     }
 
+    /**
+     * @param integer $count
+     * @return ModelQueryInterface
+     */
+    public function setTotalCount(int $count): QueryInterface
+    {
+        $this->totalCount = $count;
+        return $this;
+    }
+
+    /**
+     * @return PaginationInterface
+     */
     public function getPagination(): PaginationInterface
     {
         return new Pagination($this);
     }
+    
+    /**
+     * @return array
+     */
+    public function getSelect(): array
+    {
+        return $this->select;
+    }
 
+    /**
+     * @return integer
+     */
     public function getLimit(): int
     {
         return (int)$this->limit;
@@ -135,6 +192,10 @@ class QueryModel implements ModelQueryInterface
      */
     public function getTotalCount(): int
     {
+        if ((int)$this->totalCount > 0) {
+            return $this->totalCount;
+        }
+
         $params = [
             'filter' => $this->filter
         ];
@@ -210,5 +271,13 @@ class QueryModel implements ModelQueryInterface
     public function getSort(): array
     {
         return $this->sort ?? [];
+    }
+
+    /**
+     * @return integer
+     */
+    public function getOffset(): int
+    {
+        return $this->limit * ($this->page - 1);
     }
 }

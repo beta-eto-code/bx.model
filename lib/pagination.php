@@ -6,6 +6,8 @@ namespace Bx\Model;
 
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\PaginationInterface;
+use Bx\Model\Interfaces\QueryInterface;
+use JsonSerializable;
 
 class Pagination implements PaginationInterface
 {
@@ -17,15 +19,14 @@ class Pagination implements PaginationInterface
      * @var int
      */
     private $totalCount;
-
     /**
      * @var int
      */
     private $countPages;
 
-    public function __construct(ModelQueryInterface $modelQuery)
+    public function __construct(QueryInterface $query)
     {
-        $this->query = $modelQuery;
+        $this->query = $query;
     }
 
     public function getPage(): int
@@ -77,6 +78,11 @@ class Pagination implements PaginationInterface
     public function getLimit(): int
     {
         return $this->query->getLimit();
+    }
+    
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     public function toArray(): array
