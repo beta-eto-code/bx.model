@@ -4,6 +4,7 @@ namespace Bx\Model;
 
 use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
+use Bx\Model\Interfaces\ReadableCollectionInterface;
 use SplObjectStorage;
 
 class Collection implements CollectionInterface
@@ -108,9 +109,9 @@ class Collection implements CollectionInterface
     /**
      * @param string $key
      * @param mixed $value
-     * @return CollectionItemInterface[]|CollectionInterface
+     * @return CollectionItemInterface[]|ReadableCollectionInterface
      */
-    public function filterByKey(string $key, $value): CollectionInterface
+    public function filterByKey(string $key, $value): ReadableCollectionInterface
     {
         $newCollection = new static;
         foreach($this as $item) {
@@ -124,9 +125,9 @@ class Collection implements CollectionInterface
 
     /**
      * @param callable $fn - attribute CollectionItemInterface
-     * @return CollectionInterface
+     * @return ReadableCollectionInterface
      */
-    public function filter(callable $fn): CollectionInterface
+    public function filter(callable $fn): ReadableCollectionInterface
     {
         $newCollection = new static;
         foreach($this as $item) {

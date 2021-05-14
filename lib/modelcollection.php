@@ -6,6 +6,7 @@ namespace Bx\Model;
 use ArrayIterator;
 use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
+use Bx\Model\Interfaces\ReadableCollectionInterface;
 use SplObjectStorage;
 
 class ModelCollection implements CollectionInterface
@@ -155,7 +156,7 @@ class ModelCollection implements CollectionInterface
      * @param mixed $value
      * @return AbsOptimizedModel[]|ModelCollection
      */
-    public function filterByKey(string $key, $value): CollectionInterface
+    public function filterByKey(string $key, $value): ReadableCollectionInterface
     {
         $newCollection = new static([], $this->className);
         foreach($this as $item) {
@@ -180,9 +181,9 @@ class ModelCollection implements CollectionInterface
 
     /**
      * @param callable $fn
-     * @return $this
+     * @return ReadableCollectionInterface
      */
-    public function filter(callable $fn): self
+    public function filter(callable $fn): ReadableCollectionInterface
     {
         return new static(array_filter(iterator_to_array($this->items), $fn), $this->className);
     }
@@ -219,7 +220,7 @@ class ModelCollection implements CollectionInterface
      * @param $fn
      * @return AbsOptimizedModel|null
      */
-    public function find($fn): ?AbsOptimizedModel
+    public function find($fn): ?CollectionItemInterface
     {
         foreach($this as $item) {
             if ($fn($item) === true) {
