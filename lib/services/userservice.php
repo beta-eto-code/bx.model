@@ -65,10 +65,6 @@ class UserService extends BaseModelService implements UserServiceInterface
      */
     public function getList(array $params, UserContextInterface $userContext = null): ModelCollection
     {
-        if ($this->validateFn instanceof Closure) {
-            $params = $this->validateFn($params, $userContext);
-        }
-
         $userList = UserTable::getList($params)->fetchAll();
         return new ModelCollection($userList, User::class);
     }
@@ -83,10 +79,6 @@ class UserService extends BaseModelService implements UserServiceInterface
      */
     public function getCount(array $params, UserContextInterface $userContext = null): int
     {
-        if ($this->validateFn instanceof Closure) {
-            $params = $this->validateFn($params, $userContext);
-        }
-
         $params['count_total'] = true;
         return UserTable::getList($params)->getCount();
     }
@@ -130,14 +122,12 @@ class UserService extends BaseModelService implements UserServiceInterface
     }
 
     /**
-     * @param User|AbsOptimizedModel $model
+     * @param User $model
      * @param UserContextInterface|null $userContext
      * @return Result
      */
     public function save(AbsOptimizedModel $model, UserContextInterface $userContext = null): Result
     {
-        $result = new Result();
-        $cUser = new CUser();
         $data = [
             'NAME' => $model->getName(),
             'LAST_NAME' => $model->getLastName(),
@@ -146,6 +136,18 @@ class UserService extends BaseModelService implements UserServiceInterface
             'PERSONAL_PHONE' => $model->getPhone(),
         ];
 
+        return $this->saveUserData($model, $data);
+    }
+
+    /**
+     * @param User $model
+     * @param array $data
+     * @return Result
+     */
+    private function saveUserData(User $model, array $data): Result
+    {
+        $result = new Result();
+        $cUser = new CUser();
         if ($model->getId() > 0) {
             $isSuccess = (bool)$cUser->Update($model->getId(), $data);
             if (!$isSuccess) {
@@ -228,5 +230,50 @@ class UserService extends BaseModelService implements UserServiceInterface
         }
 
         return new UserContext($user);
+    }
+
+    /**
+     * @param User $user
+     * @param string ...$keyListForSave
+     * @return void
+     */
+    public function saveExtendedData(User $user, string ...$keyListForSave): Result
+    {
+        $data = [];
+        if (!empty($keyListForSave)) {
+            foreach($keyListForSave as $key) {
+                if ($user->hasValueKey($key)) {
+                    $data[$key] = $user->getValueByKey($key);
+                }
+            }
+
+            return $this->saveUserData($user, $data);
+        }
+
+        foreach($user as $key => $value) {
+            if (!in_array($key, ['PASSWORD', 'CHECKWORD'])) {
+                $data[$key] = $value;
+            }
+        }
+
+        return $this->saveUserData($user, $data);
+    }
+
+    /**
+     * @param User $user
+     * @param string $password
+     * @return Result
+     */
+    public function updatePassword(User $user, string $password): Result
+    {
+        if (!$user->getId()) {
+            return (new Result())->addError(new Error('Invalid user'));
+        }
+
+        $user['PASSWORD'] = $password;
+        $result = $this->saveExtendedData($user, 'PASSWORD');
+        unset($user['PASSWORD']);
+
+        return $result;
     }
 }

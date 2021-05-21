@@ -3,6 +3,8 @@
 
 namespace Bx\Model\Interfaces;
 
+use Bitrix\Main\Result;
+use Bx\Model\Models\User;
 
 interface UserServiceInterface extends ModelServiceInterface
 {
@@ -17,6 +19,20 @@ interface UserServiceInterface extends ModelServiceInterface
      * @return bool
      */
     public function isAuthorized(): bool;
+
+    /**
+     * @param User $user
+     * @param string ...$keyListForSave
+     * @return void
+     */
+    public function saveExtendedData(User $user, string ...$keyListForSave): Result;
+
+    /**
+     * @param User $user
+     * @param string $password
+     * @return Result
+     */
+    public function updatePassword(User $user, string $password): Result;
 
     /**
      * @return UserContextInterface|null

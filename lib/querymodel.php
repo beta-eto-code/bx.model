@@ -7,14 +7,14 @@ namespace Bx\Model;
 use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\PaginationInterface;
-use Bx\Model\Interfaces\ModelServiceInterface;
+use Bx\Model\Interfaces\Models\QueryableModelServiceInterface;
 use Bx\Model\Interfaces\QueryInterface;
 use Bx\Model\Interfaces\UserContextInterface;
 
 class QueryModel implements ModelQueryInterface
 {
     /**
-     * @var ModelServiceInterface
+     * @var QueryableModelServiceInterface
      */
     private $modelService;
     /**
@@ -46,7 +46,7 @@ class QueryModel implements ModelQueryInterface
      */
     private $totalCount;
 
-    public function __construct(ModelServiceInterface $modelService, UserContextInterface $userContext = null)
+    public function __construct(QueryableModelServiceInterface $modelService, UserContextInterface $userContext = null)
     {
         $this->modelService = $modelService;
         $this->userContext = $userContext;
