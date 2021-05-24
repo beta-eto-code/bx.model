@@ -8,11 +8,12 @@ use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use SplObjectStorage;
+use Bx\Model\Interfaces\ModelInterface;
 
 class ModelCollection implements CollectionInterface
 {
     /**
-     * @var AbsOptimizedModel[]|CollectionItemInterface[]|SplObjectStorage
+     * @var ModelInterface[]|CollectionItemInterface[]|SplObjectStorage
      */
     protected $items;
     /**
@@ -59,10 +60,10 @@ class ModelCollection implements CollectionInterface
 
     /**
      * @deprecated
-     * @param AbsOptimizedModel $model
+     * @param ModelInterface $model
      * @return void
      */
-    public function addModel(AbsOptimizedModel $model)
+    public function addModel(ModelInterface $model)
     {
         $this->append($model);
     }
@@ -73,7 +74,7 @@ class ModelCollection implements CollectionInterface
     }
 
     /**
-     * @return AbsOptimizedModel[]|SplObjectStorage|ArrayIterator
+     * @return ModelInterface[]|SplObjectStorage|ArrayIterator
      */
     public function getIterator()
     {
@@ -82,7 +83,7 @@ class ModelCollection implements CollectionInterface
     }
 
     /**
-     * @return AbsOptimizedModel|CollectionItemInterface|null
+     * @return ModelInterface|CollectionItemInterface|null
      */
     public function first(): ?CollectionItemInterface
     {
@@ -154,7 +155,7 @@ class ModelCollection implements CollectionInterface
     /**
      * @param string $key
      * @param mixed $value
-     * @return AbsOptimizedModel[]|ModelCollection
+     * @return ModelInterface[]|ModelCollection
      */
     public function filterByKey(string $key, $value): ReadableCollectionInterface
     {
@@ -207,7 +208,7 @@ class ModelCollection implements CollectionInterface
     /**
      * @param string $fieldName
      * @param $value
-     * @return AbsOptimizedModel|null
+     * @return ModelInterface|null
      */
     public function findByColumn(string $fieldName, $value): ?CollectionItemInterface
     {
@@ -218,7 +219,7 @@ class ModelCollection implements CollectionInterface
 
     /**
      * @param $fn
-     * @return AbsOptimizedModel|null
+     * @return ModelInterface|null
      */
     public function find($fn): ?CollectionItemInterface
     {
@@ -233,9 +234,9 @@ class ModelCollection implements CollectionInterface
 
     /**
      * @param int $index
-     * @return AbsOptimizedModel|null
+     * @return ModelInterface|null
      */
-    public function getByIndex(int $index): ?AbsOptimizedModel
+    public function getByIndex(int $index): ?ModelInterface
     {
         $list = iterator_to_array($this->items) ?? [];
         return $list[$index] ?? null;

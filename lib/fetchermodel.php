@@ -3,10 +3,13 @@
 
 namespace Bx\Model;
 
-
+use Bx\Model\Interfaces\FetcherModelInterface;
 use Bx\Model\Interfaces\ModelServiceInterface;
+use Bx\Model\Interfaces\AggregateModelInterface;
+use Bx\Model\Interfaces\QueryInterface;
+use Exception;
 
-class FetcherModel
+class FetcherModel implements FetcherModelInterface
 {
     /**
      * @var ModelServiceInterface
@@ -36,6 +39,18 @@ class FetcherModel
      * @var bool
      */
     private $isMultipleValue;
+    /**
+     * @var AggregateModelInterface|string|null
+     */
+    private $classCast;
+    /**
+     * @var QueryInterface
+     */
+    private $query;
+    /**
+     * @var callable
+     */
+    private $compareCallback;
 
     /**
      * FetcherModel constructor.
@@ -44,7 +59,7 @@ class FetcherModel
      * @param string $foreignKey
      * @param string $destKey
      * @param bool $isMultipleValue
-     * @param array $addFilter
+     * @param QueryInterface|null $query
      */
     public function __construct(
         ModelServiceInterface $linkedService,
@@ -52,15 +67,16 @@ class FetcherModel
         string $foreignKey,
         string $destKey,
         bool $isMultipleValue = false,
-        array $addFilter = []
+        QueryInterface $query = null
     )
     {
+        $this->classCast = null;
         $this->service = $linkedService;
         $this->keySave = $keySave;
         $this->foreignKey = $foreignKey;
         $this->linkedModelKey = $this->destKey = $destKey;
         $this->isMultipleValue = $isMultipleValue;
-        $this->addFilter = $addFilter;
+        $this->query = $query;
     }
 
     /**
@@ -68,7 +84,7 @@ class FetcherModel
      * @param string $keySave
      * @param string $foreignKey
      * @param string $destKey
-     * @param array $addFilter
+     * @param QueryInterface|null $query
      * @return static
      */
     public static function initAsSingleValue(
@@ -76,10 +92,10 @@ class FetcherModel
         string $keySave,
         string $foreignKey,
         string $destKey,
-        array $addFilter = []
+        QueryInterface $query = null
     ): self
     {
-        return new static($linkedService, $keySave, $foreignKey, $destKey, false, $addFilter);
+        return new static($linkedService, $keySave, $foreignKey, $destKey, false, $query);
     }
 
     /**
@@ -87,7 +103,7 @@ class FetcherModel
      * @param string $keySave
      * @param string $foreignKey
      * @param string $destKey
-     * @param array $addFilter
+     * @param QueryInterface|null $query
      * @return static
      */
     public static function initAsMultipleValue(
@@ -95,10 +111,10 @@ class FetcherModel
         string $keySave,
         string $foreignKey,
         string $destKey,
-        array $addFilter = []
+        QueryInterface $query = null
     ): self
     {
-        return new static($linkedService, $keySave, $foreignKey, $destKey, true, $addFilter);
+        return new static($linkedService, $keySave, $foreignKey, $destKey, true, $query);
     }
 
     /**
@@ -117,8 +133,29 @@ class FetcherModel
      */
     private function getLinkedCollection(array $listKeyValues): ModelCollection
     {
-        $filter = array_merge($this->addFilter, ["={$this->destKey}" => $listKeyValues]);
-        return $this->service->getList(['filter' => $filter]);
+        $addFilter = $this->query instanceof QueryInterface ? $this->query->getFilter() : [];
+        $filter = array_merge($addFilter, ["={$this->destKey}" => $listKeyValues]);
+        $params = ['filter' => $filter];
+
+        if ($this->query instanceof QueryInterface) {
+            if ($this->query->hasSelect()) {
+                $params['select'] = $this->query->getSelect();
+            }
+            
+            if ($this->query->hasLimit()) {
+                $params['limit'] = $this->query->getLimit();
+            }
+
+            if ($this->query->hasSort()) {
+                $params['order'] = $this->query->getSort();
+            }
+
+            if ($this->query->hasFetchList()) {
+                $params['fetch'] = $this->query->getFetchList();
+            }
+        }
+
+        return $this->service->getList($params);
     }
 
     /**
@@ -128,7 +165,7 @@ class FetcherModel
     {
         $listKeyValues = [];
         foreach($collection->column($this->foreignKey) as $value) {
-            $listKeyValues = array_merge($listKeyValues, $value);
+            $listKeyValues = array_merge($listKeyValues, (array)$value);
         }
 
         if (empty($listKeyValues)) {
@@ -137,15 +174,19 @@ class FetcherModel
 
         $linkedCollection = $this->getLinkedCollection($listKeyValues);
         foreach ($collection as $model) {
-            $originalValue = $model[$this->foreignKey] ?? null;
+            $originalValue = (array)($model[$this->foreignKey] ?? []);
             if (empty($originalValue)) {
                 continue;
             }
 
+            $isCallableCallback = $this->compareCallback !== null;
             $resultList = [];
             foreach ($linkedCollection as $linkedModel) {
                 $likedValue = $linkedModel[$this->linkedModelKey] ?? null;
-                if (!empty($likedValue) && is_array($originalValue) && in_array($likedValue, $originalValue)) {
+                if (
+                    ($isCallableCallback && ($this->compareCallback)($model, $linkedModel)) ||
+                    (!empty($likedValue) && is_array($originalValue) && in_array($likedValue, $originalValue))
+                ) {
                     $resultList[] = $linkedModel;
                     if (empty($class)) {
                         $class = get_class($linkedModel);
@@ -154,9 +195,35 @@ class FetcherModel
             }
 
             if (!empty($class)) {
-                $model[$this->keySave] = new ModelCollection($resultList, $class);
+                $resultCollection = new ModelCollection($resultList, $class);
+                $model[$this->keySave] = !empty($this->classCast) ? $this->classCast::init($resultCollection) : $resultCollection;
             }
         }
+    }
+
+    /**
+     * @param string $class
+     * @return FetcherModelInterface
+     */
+    public function castTo(string $class): FetcherModelInterface
+    {
+        if (!class_exists($class)) {
+            throw new Exception("{$class} is not found!");
+        }
+
+        $this->classCast = $class;
+        return $this;
+    }
+
+
+    /**
+     * @param callable $fn
+     * @return FetcherModelInterface
+     */
+    public function setCompareCallback(callable $fn): FetcherModelInterface
+    {
+        $this->compareCallback = $fn;
+        return $this;
     }
 
     /**
@@ -169,6 +236,7 @@ class FetcherModel
             return;
         }
 
+        $isCallableCallback = $this->compareCallback !== null;
         $linkedCollection = $this->getLinkedCollection($listKeyValues);
         foreach ($collection as $model) {
             $originalValue = $model[$this->foreignKey] ?? null;
@@ -178,7 +246,10 @@ class FetcherModel
 
             foreach ($linkedCollection as $linkedModel) {
                 $likedValue = $linkedModel[$this->linkedModelKey] ?? null;
-                if (!empty($likedValue) && $originalValue == $likedValue) {
+                if (
+                    ($isCallableCallback && ($this->compareCallback)($model, $linkedModel)) ||
+                    (!empty($likedValue) && $originalValue == $likedValue)
+                ) {
                     $model[$this->keySave] = $linkedModel;
                 }
             }

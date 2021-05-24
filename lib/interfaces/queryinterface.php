@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Bx\Model\Interfaces;
 
 interface QueryInterface
@@ -22,6 +20,11 @@ interface QueryInterface
      * @return $this
      */
     public function setLimit(int $limit): QueryInterface;
+    /**
+     * @param array $group
+     * @return QueryInterface
+     */
+    public function setGroup(array $group): QueryInterface;
     /**
      * @param integer $limit
      * @return QueryInterface
@@ -65,7 +68,42 @@ interface QueryInterface
      */
     public function getTotalCount(): int;
     /**
+     * @return array
+     */
+    public function getGroup(): array;
+    /**
      * @return integer
      */
     public function getOffset(): int;
+    /**
+     * Указываем связанные сущности для выборки
+     * @param array $list
+     * @return QueryInterface
+     */
+    public function setFetchList(array $list): QueryInterface;
+    /**
+     * Связанные сущности для выборки
+     * @return array
+     */
+    public function getFetchList(): array;
+    /**
+     * @return boolean
+     */
+    public function hasFetchList(): bool;
+    /**
+     * @return boolean
+     */
+    public function hasSelect(): bool;
+    /**
+     * @return boolean
+     */
+    public function hasFilter(): bool;
+    /**
+     * @return boolean
+     */
+    public function hasLimit(): bool;
+    /**
+     * @return boolean
+     */
+    public function hasSort(): bool;
 }

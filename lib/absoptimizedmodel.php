@@ -3,14 +3,12 @@
 
 namespace Bx\Model;
 
-use ArrayAccess;
 use Bitrix\Main\Type\Date;
-use Bitrix\Main\Type\DateTime;
-use IteratorAggregate;
+use Bitrix\Main\Type\DateTime;;
 use ArrayIterator;
-use Bx\Model\Interfaces\CollectionItemInterface;
+use Bx\Model\Interfaces\ModelInterface;
 
-abstract class AbsOptimizedModel implements ArrayAccess, IteratorAggregate, CollectionItemInterface
+abstract class AbsOptimizedModel implements ModelInterface
 {
     /**
      * @var array

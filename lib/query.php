@@ -9,27 +9,35 @@ class Query implements QueryInterface
     /**
      * @var array
      */
-    private $select;
+    protected $select;
     /**
      * @var array
      */
-    private $filter;
+    protected $filter;
     /**
      * @var array
      */
-    private $sort;
+    protected $sort;
     /**
      * @var int
      */
-    private $limit;
+    protected $limit = 0;
     /**
      * @var int
      */
-    private $page;
+    protected $page = 1;
     /**
      * @var int
      */
-    private $totalCount;
+    protected $totalCount;
+    /**
+     * @var array
+     */
+    protected $fetchList;
+    /**
+     * @var array
+     */
+    protected $group;
 
     /**
      * @param array $select
@@ -73,6 +81,17 @@ class Query implements QueryInterface
     }
 
     /**
+     * Указываем связанные сущности для выборки
+     * @param array $list
+     * @return QueryInterface
+     */
+    public function setFetchList(array $list): QueryInterface
+    {
+        $this->fetchList = $list;
+        return $this;
+    }
+
+    /**
      * Указываем текущу страницу (работает совместно с максимальным количеством элементов)
      * @param int $page
      * @return $this
@@ -80,6 +99,16 @@ class Query implements QueryInterface
     public function setPage(int $page): QueryInterface
     {
         $this->page = $page;
+        return $this;
+    }
+
+    /**
+     * @param array $group
+     * @return QueryInterface
+     */
+    public function setGroup(array $group): QueryInterface
+    {
+        $this->group = $group;
         return $this;
     }
 
@@ -108,6 +137,15 @@ class Query implements QueryInterface
     public function getSort(): array
     {
         return (array)($this->sort ?? []);
+    }
+
+    /**
+     * Связанные сущности для выборки
+     * @return array
+     */
+    public function getFetchList(): array
+    {
+        return (array)($this->fetchList ?? []);
     }
     
     /**
@@ -144,10 +182,66 @@ class Query implements QueryInterface
     }
 
     /**
+     * @return array
+     */
+    public function getGroup(): array
+    {
+        return (array)($this->group ?? []);
+    }
+
+    /**
      * @return integer
      */
     public function getOffset(): int
     {
         return $this->limit * ($this->page - 1);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasFetchList(): bool
+    {
+        return !is_null($this->fetchList);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasSelect(): bool
+    {
+        return !empty($this->select);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasFilter(): bool
+    {
+        return !empty($this->filter);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasLimit(): bool
+    {
+        return !empty($this->limit);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasSort(): bool
+    {
+        return !empty($this->sort);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasGroup(): bool
+    {
+        return !empty($this->group);
     }
 }
