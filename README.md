@@ -14,6 +14,8 @@
     - [MappedCollection & MappedCollectionCallback](#mappedcollection--mappedcollectioncallback)
       - [Пример использования](#пример-использования-1)
   - [Сервисы](#сервисы)
+    - [Пример описания сервиса](#пример-описания-сервиса)
+    - [Пример использования сервиса](#пример-использования-сервиса)
     - [Query](#query)
     - [Pagination](#pagination)
     - [Fetcher](#fetcher)
@@ -445,7 +447,7 @@ class CatalogProductService extends BaseModelService
 }
 ```
 
-#### Пример использования сервиса
+### Пример использования сервиса
 
 ```php
 $catalogProductService = new CatalogProductService();
