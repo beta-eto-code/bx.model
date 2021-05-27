@@ -17,7 +17,9 @@
     - [Пример описания сервиса](#пример-описания-сервиса)
     - [Пример использования сервиса](#пример-использования-сервиса)
     - [Query](#query)
+      - [Пример использования](#пример-использования-2)
     - [Pagination](#pagination)
+      - [Пример использования](#пример-использования-3)
     - [Fetcher](#fetcher)
     - [Админ. интерфейсы](#админ-интерфейсы)
   - [Базовые сервисы](#базовые-сервисы)
@@ -443,7 +445,6 @@ class CatalogProductService extends BaseModelService
     {
         return CatalogProductTable::delete($id);
     }
-
 }
 ```
 
@@ -474,16 +475,303 @@ $product->setName('New product name');
 $resultSave = $catalogProductService->save($product);
 $resultDelete = $catalogProductService->delete(10);
 ```
-
-
 ### Query
-...
+
+В модуле представлена объектная модель параметров запроса из базы, описана в интерфейсе QueryInterface, так же есть полная реализация данного интрефейса - Query. Объекты данного класса могут содержать параметры: select, filter, order, group, limit,offset. Есть производный интерфейс ModelQueryInterface, в модуле есть полная реалзизация данного интерфейса QueryModel, работает непосредственно с сервисом моделей, сервис передается в конструктор и посредством двойной диспечиризации обеспецивается выборка данных, предоставляет дополнительные методы для выборки моделей:
+
+* loadFiler - формирует фильтр на основе переданного ассоциативного массива в соотвествии с правилами фильтрации сервиса, описанными в методе ModelServiceInterface->getFilterFields()
+* loadSort - формирует параметры сортировки данных на основе переданного ассоциативного массива в соотвествии с правилами сортировки сервиса, описанными в методе ModelServiceInterface->getSortFields()
+* loadPagination - формирует параметры пагинации на основе переданного массива, используются ключи: limit и page
+* getPagination - возвращает обект пагинации PaginationInterface
+* getList - возвращает коллецию моделей на сонове сформированных параметров выборки
+
+#### Пример использования
+
+```php
+use Bitrix\Main\Application;
+
+$catalogProductService = new CatalogProductService();
+$request = Application::getInstance()->getContext()->getRequest();
+$queryParams = $request->getQueryParams();
+
+$query = $catalogProductService->query();   // возвращается объект QueryModel
+$query->loadFiler($queryParams)             // загружаем фильтр из http запроса
+    ->loadSort($queryParams)                // загружаем параметры сотрировки
+    ->loadPagination($queryParams);         // загружаем параметры пагинации
+
+$query->hasFilter();                        // проверяет наличие параметров для фильтрации
+$query->getFilter();                        // возвращает параметры для фильтрации
+
+$query->hasSort();                          // проверяет наличие параметров для сортировки
+$query->getSort();                          // возвращает параметры для сортировки
+
+$query->hasLimit();                         // проверяет наличие параметров для ограничения выборки
+$query->getLimit();                         // возвращает параметры ограничения выборки
+
+$query->getPage();                          // номер страницы для пагинации
+$query->getOffset();                        // номер элемента с которого начинается выборка
+
+$productCollection = $query->getList();     // возвращает коллекцию товаров в соотвествии с сформированными параметрами выборки
+```
+
 ### Pagination
-...
+
+Для более удобной работы с пагинацией описан интрефейс PaginationInterface, в модуле имеется полная реализация данного интерфейса - Pagination. Данный класс работает совместно с интерфейсом QueryInterface.
+
+#### Пример использования
+
+```php
+use Bitrix\Main\Application;
+
+$catalogProductService = new CatalogProductService();
+$request = Application::getInstance()->getContext()->getRequest();
+$queryParams = $request->getQueryParams();
+
+$query = $catalogProductService->query();   // возвращается объект QueryModel
+$query->loadFiler($queryParams)             // загружаем фильтр из http запроса
+    ->loadSort($queryParams)                // загружаем параметры сотрировки
+    ->loadPagination($queryParams);         // загружаем параметры пагинации
+
+$pagination = $query->getPagination();      // возвращается объект Pagination
+$pagination->getPage();                     // номер текущей страницы
+$pagination->getCountPages();               // общее количество страниц
+$pagination-getTotalCountElements();        // общее количество элементов
+$pagination->getCountElements();            // количество элементов на текущей странице
+$pagination->getLimit();                    // максимальное количество элементов на странице
+
+json_encode($pagination);                   // JSON представление
+$pagination->toArray();                     // представление в виде ассоциативного массива
+```
+
 ### Fetcher
-...
+
+Довольно часто тербуется получить модель данных со связанными моделями (по внешним ключам БД или другим критериям), для упрощения этой задачи был описан интерфейс FetcherModelInterface, данный интерфейс имеет полуную реализацию - FetcherModel. Данный класс работает с сервисами моделей, для более простой реализации описан абстракный класс сервиса моделей BaseLinkedModelService на основе этого класса можно описать совой сервис для выборки моделей со связанными моделями.
+
+### Пример описания сервиса
+
+```php
+use Bx\Model\BaseLinkedModelService;
+use Bx\Model\FetcherModel;
+use Bx\Model\Query;
+use Bx\Model\Interfaces\FileServiceInterface;
+
+class ExtendedCatalogProductService extends BaseLinkedModelService
+{
+    /**
+     * @var FileServiceInterface
+     */
+    private $fileService;
+
+    public function __construct(FileServiceInterface $fileService)
+    {
+        $this->fileService = $fileService;
+    }
+
+    protected function getFilterFields(): array
+    {
+        return [
+            // указываем разрешенные для фильтрации поля
+        ];
+    }
+
+    protected function getSortFields(): array
+    {
+        return [
+            // указываем разрешенные для сортировки поля
+        ];
+    }
+
+    protected function getLinkedFields(): array
+    {
+        /**
+         * В данном методе описываются внешние связи через FetcherModelInterface
+         * в виде ассоциативного массива
+         */
+
+        $imageQuery = new Query();
+        $imageQuery->setFetchList([]);  // пустой массив указывает на то что свзанные модели выбирать не нужно, по-умолчанию выбираются все связанные модели
+        $imageQuery->setSelect(['ID', 'SIZE', 'DESCRIPTION']);
+        $imageQuery->setFilter('=CONTENT_TYPE' => ['jpg', 'png', 'gif']);
+
+        $docsQuery = new Query();
+        $docsQuery->setFetchList([]);
+        $docsQuery->setFilter('=CONTENT_TYPE' => ['doc', 'docx', 'pdf']);
+
+        return [
+            'image' => FetcherModel::initAsSingleValue( // будет выбрана одна модель
+                $this->fileService,
+                'image',        // ключ по которому будет доступна связанная модель
+                'IMAGE_ID',     // внешний ключ текущей сущности
+                'ID',           // первичный ключ связанной сущности
+                $imageQuery     // указываем доп. параметры выборки
+            ),
+            'docs' => FetcherModel::initAsMultipleValue( // будет выбрана коллекция моделей
+                $this->fileService,
+                'docs',
+                'ID',
+                'PRODUCT_ID',
+                $docsQuery
+            )->castTo(AggreageDocumentModel::cass), // выбранная коллекция будет преобразована в указанную агрегационную модель
+        ];
+    }
+
+    protected function getInternalList(array $params, UserContextInterface $userContext = null): ModelCollection
+    { 
+        $list = CatalogProductTable::getList($params)->fetchAll(); 
+        return new ModelCollection($list, CatalogProduct::class);
+    }
+
+    public function getCount(array $params, UserContextInterface $userContext = null): int
+    {
+        $params['select'] = ['ID'];
+        $params['count_total'] = true;
+        $params['limit'] = 1;
+
+        return $this->getList($params, $userContext)->first();
+    }
+
+    public function getById(int $id, UserContextInterface $userContext = null): ?AbsOptimizedModel;
+    {
+        $params = [
+            'filter' => [
+                '=ID' => $id,
+            ],
+            'limit' => 1,
+        ];
+
+        return $this->getList($params, $userContext)->first();
+    }
+
+    function save(AbsOptimizedModel $model, UserContextInterface $userContext = null): Result
+    {
+        $data = [
+            'NAME' => $model->getName(), 
+        ];
+
+        if ($model->getId() > 0) {
+            return CatalogProductTable::update($model->getId(), $data);
+        }
+
+        $result = CatalogProductTable::add($data);
+        if ($result->isSuccess()) {
+            $model['ID'] = $result->getId();
+        }
+
+        return $result;
+    }
+
+    function delete(int $id, UserContextInterface $userContext = null): Result
+    {
+        return CatalogProductTable::delete($id);
+    }
+}
+```
+
+#### Пример использования
+
+```php
+
+use Bx\Model\Services\FileService;
+
+$fileService = new FileService();
+$productService = new ExtendedCatalogProductService($fileService);
+
+$collection1 = $productService->getList([]);                       // будут выбраны все связанные модели             
+$collection2 = $productService->getList(['fetch' => []]);          // связанные модели не будут выбраны
+$collection3 = $productService->getList(['fetch' => ['image']]);   // из связанных моделей будет выбораны только модели с ключом image
+
+$firstModel = $collection1->first();
+$firstModel['image'];      // Объект File
+$firstModel['docs'];       // Объект AggreageDocumentModel
+```
+
 ### Админ. интерфейсы
-...
+
+В модуле представлены инструменты для быстрого отображения списка моделей в админ. интерфейсе Битрикса, с возможностью фильтрации, поиска, создания произвольных множественных и одиночных событий.
+
+#### Пример использования
+
+```php
+use Bx\Model\UI\Admin\ModelGrid;
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_admin_before.php');
+
+$fileService = new FileService();
+$productService = new ExtendedCatalogProductService($fileService);
+$grid = new ModelGrid(
+    $productService,        // указываем сервис для работы с данными
+    'product_list',         // указываем символьный идентификатор списка сущности
+    'ID'                    // ключ свойства модели для идентификации
+);
+
+/**
+ * Указываем поля фильтрации
+ */
+$grid->addSearchFilterField('name', 'Название');
+$grid->addNumericFilterField('id', 'ID');
+$grid->addStringFilterField('article', 'Артикул');
+$grid->addDateFilterField('date_create', 'Дата создания');
+$grid->addListFilterField('status', 'Статус', [
+    1 => 'Новый',
+    2 => 'Опубликован',
+    3 => 'Снят с публикации',
+]);
+
+/**
+ * Указываем колонки для вывода в таблице
+ */
+$grid->addColumn('id', 'ID');
+$grid->addColumn('name', 'Название');
+$grid->addColumn('article', 'Артикул');
+$grid->addColumn('date_create', 'Дата создания');
+$grid->addCalculateColumn(
+    'status', 
+    funtion(ExtendedCatalogProduct $product) {
+        return $product->getStatusName();
+    },
+    'Статус'
+);
+
+/**
+ * Указываем действия над элементами
+ */
+$grid->setSingleAction('Удалить', 'delete')
+    ->setCallback(function (int $id) use ($productService) {
+        $productService->delete($id);
+    });
+$grid->setSingleAction('Перейти', 'redirect')
+    ->setJs('location.href="/bitrix/admin/product_detail.php?id=#id#"');
+
+/**
+ * Указываем действия над группой элементов
+ */
+$grid->setGroupAction('Удалить', 'delete')
+    ->useConfirm('Подтвердить')
+    ->setCallback(function (array $ids) use ($productService) {
+        foreach ($ids as $id) {
+            $productService->delete((int)$id);
+        }
+    });
+$grid->setGroupAction('Опубликовать', 'accept')
+    ->useConfirm('Подтвердить')
+    ->setCallback(function (array $ids) use ($productService) {
+        $productCollection = $productService->getList([
+            'filter' => [
+                '=ID' => $ids,
+            ],
+            'fetch' => [],
+        ]);
+        foreach ($productCollection as $currentProduct) {
+            $currentProduct->setStatus(2);
+            $productService->save($currentProduct);
+        }
+    });
+
+require($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_admin_after.php');
+$grid->show();  // показываем собранную таблицу
+
+require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php");
+```
 
 ## Базовые сервисы
 
