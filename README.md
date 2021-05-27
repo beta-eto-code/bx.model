@@ -21,10 +21,15 @@
     - [Pagination](#pagination)
       - [Пример использования](#пример-использования-3)
     - [Fetcher](#fetcher)
+    - [Пример описания сервиса](#пример-описания-сервиса-1)
+      - [Пример использования](#пример-использования-4)
     - [Админ. интерфейсы](#админ-интерфейсы)
+      - [Пример использования](#пример-использования-5)
   - [Базовые сервисы](#базовые-сервисы)
     - [Сервис для работы с пользователями](#сервис-для-работы-с-пользователями)
+      - [Пример использования](#пример-использования-6)
     - [Сервис для работы с файлами](#сервис-для-работы-с-файлами)
+      - [Пример использования](#пример-использования-7)
 
 ## Установка
 ```
@@ -781,15 +786,55 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admi
 * UserService - позволяет работать с пользователями из таблицы b_user
 ### Сервис для работы с пользователями
 
-...
+Помимо стандартных методов сервиса моделей, предоставляет след. методы:
+
+* login(string $login, string $password): ?UserContextInterface - авторизация по логину и паролю
+* isAuthorized(): bool - проверка авторизации
+* saveExtendedData(User $user, string ...$keyListForSave): Result - сохранение пользователя с произвольным набором данных
+* updatePassword(User $user, string $password): Result - обновление пароля пользователя
+* getCurrentUser(): ?UserContextInterface - запрос текущего пользователя, по факту возвращает объект контекста из которого уже можно получить модель пользователя
+
+Как видно из описания методов, в ряде случаев сервис возвращает не саму модель а контекст модели - UserContextInterface, а уже из кнотекста можно запросить либо идентификатор пользователя getUserId или саму модель пользователя getUser. В данном интерфейсе есть 2 интересных метода: 
+
+* setAccessStrategy(AccessStrategyInterface $accessStrategy) - позволяет укзать произвольную стратегию по разграничению доступа
+* hasAccessOperation(int $operationId): bool - проверяет возможность выполнения пользователем произвольной операции в соотвествии с указанной стратегией
+
+#### Пример использования
+
+```php
+use Bx\Model\Services\UserService;
+
+$userService = new UserService();
+$userContext = $userService->login('admin@mail.xyz', 'mypassword');
+$isAuthorized = $userService->isAuthorized();
+$userId = $userContext->getId();
+
+$user = $userContext->getUser();
+$user->getId();
+$user->getName();
+
+$userContext->setAccessStrategy(new SimpleAccessStrategy());
+$userContext->hasAccessOperation(OperationListInterface::CAN_DELETE_FILES);
+```
+
+
 ### Сервис для работы с файлами
 
-Для реализации новых моделей необходимо использовать абстрактный класс
-AbsOptimizedModel, данный класс требует имплементации только одного метода toArray(): array
+Помимо стандартных методов сервиса моделей, предоставляет след. методы:
 
-Все сервисы моделей должны имплементировать интерфейс ModelServiceInterface.
-Есть вспомогательные абстрактные классы:
+* saveFiles(string $baseDir, string ...$filePaths): ModelCollection - сохранятет файлы из перечисленных url/абслоютных путей и возвращает коллекцию
+* function saveUploadFiles(string $baseDir, UploadedFileInterface ...$files): ModelCollection - сохраняет файлы из перечисленных объектов интерфейса UploadedFileInterface - [PSR-7](https://www.php-fig.org/psr/psr-7/)
 
-* BaseModelService 
-* BaseLinkedModelService - предоставляет возможность подгрузки связанных моделей
-* 
+#### Пример использования
+
+```php
+use Bx\Model\Services\FileService;
+
+$fileService = new FileService();
+$fileCollection = $fileService->saveFiles(
+    'test_dir', 
+    'https://some-site.xyz/image1.jpg',
+    'https://some-site.xyz/image2.jpg',
+    'https://some-site.xyz/image3.jpg' 
+);
+```
