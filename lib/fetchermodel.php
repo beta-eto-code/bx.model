@@ -51,6 +51,10 @@ class FetcherModel implements FetcherModelInterface
      * @var callable
      */
     private $compareCallback;
+    /**
+     * @var callable
+     */
+    private $modifyCallback;
 
     /**
      * FetcherModel constructor.
@@ -172,6 +176,7 @@ class FetcherModel implements FetcherModelInterface
             return;
         }
 
+        $hasModifyCallback = $this->modifyCallback !== null;
         $linkedCollection = $this->getLinkedCollection($listKeyValues);
         foreach ($collection as $model) {
             $originalValue = (array)($model[$this->foreignKey] ?? []);
@@ -196,6 +201,10 @@ class FetcherModel implements FetcherModelInterface
 
             if (!empty($class)) {
                 $resultCollection = new ModelCollection($resultList, $class);
+                if ($hasModifyCallback) {
+                    $resultCollection = ($this->modifyCallback)($resultCollection);
+                }
+
                 $model[$this->keySave] = !empty($this->classCast) ? $this->classCast::init($resultCollection) : $resultCollection;
             }
         }
@@ -212,6 +221,12 @@ class FetcherModel implements FetcherModelInterface
         }
 
         $this->classCast = $class;
+        return $this;
+    }
+
+    public function setModifyCallback(callable $fn): FetcherModelInterface
+    {
+        $this->modifyCallback = $fn;
         return $this;
     }
 
@@ -238,6 +253,7 @@ class FetcherModel implements FetcherModelInterface
 
         $isCallableCallback = $this->compareCallback !== null;
         $linkedCollection = $this->getLinkedCollection($listKeyValues);
+        $hasModifyCallback = $this->modifyCallback !== null;
         foreach ($collection as $model) {
             $originalValue = $model[$this->foreignKey] ?? null;
             if (empty($originalValue)) {
@@ -250,7 +266,7 @@ class FetcherModel implements FetcherModelInterface
                     ($isCallableCallback && ($this->compareCallback)($model, $linkedModel)) ||
                     (!empty($likedValue) && $originalValue == $likedValue)
                 ) {
-                    $model[$this->keySave] = $linkedModel;
+                    $model[$this->keySave] = $hasModifyCallback ? ($this->modifyCallback)($linkedModel) : $linkedModel;
                 }
             }
         }

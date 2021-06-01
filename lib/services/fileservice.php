@@ -2,6 +2,7 @@
 
 namespace Bx\Model\Services;
 
+use Bitrix\Crm\Settings\Mode;
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Error;
 use Bitrix\Main\ObjectPropertyException;
@@ -50,6 +51,48 @@ class FileService extends BaseModelService implements FileServiceInterface
             'height' => 'HEIGHT',
             'width' => 'WIDTH',
         ];
+    }
+
+    /**
+     * @param File[]|ModelCollection $collection
+     * @param integer $width
+     * @param integer $height
+     * @param integer|null $mode
+     * @return void
+     */
+    public function resizeImageCollection(ModelCollection $collection, int $width, int $height, ?int $mode = null)
+    {
+        foreach($collection as $image) {
+            if ($image instanceof File) {
+                $this->resizeImage($image, $width, $height, $mode);
+            }
+        }
+    }
+
+    /**
+     * @param File $image
+     * @param integer $width
+     * @param integer $height
+     * @param integer|null $mode
+     * @return void
+     */
+    public function resizeImage(File $image, int $width, int $height, ?int $mode = null)
+    {
+        $result = CFile::ResizeImageGet(
+            $image->getId(),
+            [
+                'width' => $width,
+                'height' => $height,
+            ],
+            $mode ?? BX_RESIZE_IMAGE_PROPORTIONAL,
+            true
+        );
+
+        if (!empty($result)) {
+            $image->setWidth((int)$result['width']);
+            $image->setHeight((int)$result['height']);
+            $image->setSrc((string)$result['src']);
+        }
     }
 
     /**

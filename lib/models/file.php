@@ -8,6 +8,11 @@ use Bitrix\Main\Type\DateTime;
 
 class File extends AbsOptimizedModel
 {
+    /**
+     * @var string
+     */
+    private $src;
+
     protected function toArray(): array
     {
         return [
@@ -30,7 +35,12 @@ class File extends AbsOptimizedModel
 
     public function getSrc(): string
     {
-        return (string)\CFile::GetFileSRC($this->data);
+        return !empty($this->src) ? $this->src : (string)\CFile::GetFileSRC($this->data);
+    }
+
+    public function setSrc(string $path)
+    {
+        $this->src = $path;
     }
 
     /**
@@ -66,11 +76,27 @@ class File extends AbsOptimizedModel
     }
 
     /**
+     * @return void
+     */
+    public function setHeight(int $height)
+    {
+        $this['HEIGHT'] = $height;
+    }
+
+    /**
      * @return int
      */
     public function getWidth(): int
     {
         return (int)$this['WIDTH'];
+    }
+
+    /**
+     * @return void
+     */
+    public function setWidth(int $width)
+    {
+        return $this['WIDTH'] = $width;
     }
 
     /**

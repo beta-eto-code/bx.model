@@ -21,4 +21,9 @@ interface FetcherModelInterface
      * @return FetcherModelInterface
      */
     public function setCompareCallback(callable $fn): FetcherModelInterface;
+    /**
+     * @param callable $fn
+     * @return FetcherModelInterface
+     */
+    public function setModifyCallback(callable $fn): FetcherModelInterface;
 }
