@@ -6,7 +6,7 @@ use Bx\Model\Interfaces\Models\IblockServiceInterface;
 use Bx\Model\ModelCollection;
 use Bx\Model\Models\IblockPropertyEnum;
 
-interface IblockPropertyEnumServiceInterface
+interface IblockPropertyEnumServiceInterface extends ModelServiceInterface
 {
     /**
      * @param IblockServiceInterface $iblockService
