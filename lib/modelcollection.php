@@ -6,11 +6,12 @@ namespace Bx\Model;
 use ArrayIterator;
 use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
+use Bx\Model\Interfaces\ModelCollectionInterface;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use SplObjectStorage;
 use Bx\Model\Interfaces\ModelInterface;
 
-class ModelCollection implements CollectionInterface
+class ModelCollection implements ModelCollectionInterface
 {
     /**
      * @var ModelInterface[]|CollectionItemInterface[]|SplObjectStorage
@@ -124,6 +125,17 @@ class ModelCollection implements CollectionInterface
         }
 
         return $result;
+    }
+
+
+    /**
+     * @param string $key
+     * @param string $className
+     * @return ModelCollectionInterface
+     */
+    public function collection(string $key, string $className): ModelCollectionInterface
+    {
+        return new ModelCollection($this->column($key), $className);
     }
 
     /**
