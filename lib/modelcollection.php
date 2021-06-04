@@ -10,6 +10,7 @@ use Bx\Model\Interfaces\ModelCollectionInterface;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use SplObjectStorage;
 use Bx\Model\Interfaces\ModelInterface;
+use Traversable;
 
 class ModelCollection implements ModelCollectionInterface
 {
@@ -31,9 +32,9 @@ class ModelCollection implements ModelCollectionInterface
             if ($item instanceof $className) {
                 $this->items->attach($item);
                 continue;
+            } elseif(is_array($item) || $item instanceof Traversable) {
+                $this->items->attach(new $className($item));
             }
-
-            $this->items->attach(new $className($item));
         }
     }
 
