@@ -3,7 +3,6 @@
 
 namespace Bx\Model;
 
-use ArrayIterator;
 use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
 use Bx\Model\Interfaces\ModelCollectionInterface;
@@ -12,7 +11,7 @@ use SplObjectStorage;
 use Bx\Model\Interfaces\ModelInterface;
 use Traversable;
 
-class ModelCollection implements ModelCollectionInterface
+class ModelCollection extends Collection implements ModelCollectionInterface
 {
     /**
      * @var ModelInterface[]|CollectionItemInterface[]|SplObjectStorage
@@ -50,17 +49,6 @@ class ModelCollection implements ModelCollectionInterface
     }
 
     /**
-     * @param CollectionItemInterface $item
-     * @return void
-     */
-    public function remove(CollectionItemInterface $item)
-    {
-        if ($this->items->contains($item)) {
-            $this->items->detach($item);
-        }
-    }
-
-    /**
      * @deprecated
      * @param ModelInterface $model
      * @return void
@@ -76,84 +64,37 @@ class ModelCollection implements ModelCollectionInterface
     }
 
     /**
-     * @return ModelInterface[]|SplObjectStorage|ArrayIterator
-     */
-    public function getIterator()
-    {
-        $this->items->rewind();
-        return $this->items;
-    }
-
-    /**
-     * @return ModelInterface|CollectionItemInterface|null
-     */
-    public function first(): ?CollectionItemInterface
-    {
-        $current = $this->getIterator()->current();
-        return $current instanceof CollectionItemInterface ? $current : null;
-    }
-
-    /**
-     * @return int
-     */
-    public function count()
-    {
-        return count($this->items);
-    }
-
-    /**
-     * @param string $key
-     * @param string|null $indexKey
-     * @param callable|null $fnModifier - attribute is mixed value by the key of the collection item
-     * @return array
-     */
-    public function column(string $key, string $indexKey = null, callable $fnModifier = null): array
-    {
-        $result = [];
-        $isCallable = $fnModifier !== null;
-        foreach($this as $item) {
-            $itemKey = null;
-            if (!empty($indexKey) && $item->hasValueKey($indexKey)) {
-                $itemKey = $item->getValueByKey($indexKey);
-            }
-
-            $value = $item->hasValueKey($key) ? $item->getValueByKey($key) : null;
-            if (empty($itemKey)) {
-                $result[] = $isCallable ? $fnModifier($value) : $value;
-            } else {
-                $result[$itemKey] = $isCallable ? $fnModifier($value) : $value;
-            }
-        }
-
-        return $result;
-    }
-
-
-    /**
      * @param string $key
      * @param string $className
      * @return ModelCollectionInterface
      */
     public function collection(string $key, string $className): ModelCollectionInterface
     {
-        return new ModelCollection($this->column($key), $className);
+        $result = new ModelCollection([], $className);
+        $list = $this->column($key);
+        foreach($list as $item) {
+            $this->addItemInCollection($result, $item);
+        }
+
+        return $result;
     }
 
     /**
-     * @param string $key
-     * @param callable $fn - attribute is mixed value by the key of the collection item
-     * @return array
+     * @param ModelCollectionInterface $collection
+     * @param mixed $item
+     * @return void
      */
-    public function unique(string $key, callable $fnModifier = null): array
+    private function addItemInCollection(ModelCollectionInterface $collection, $item)
     {
-        $result = [];
-        $isCallable = $fnModifier !== null;
-        foreach($this as $item) {
-            $value = $item->hasValueKey($key) ? $item->getValueByKey($key) : null;
-            $result[$value] = $isCallable ? $fnModifier($value) : $value;
+        if ($item instanceof CollectionItemInterface) {
+            $collection->append($item);
+        } elseif (is_array($item)) {
+            $collection->add($item);
+        } elseif ($item instanceof CollectionInterface) {
+            foreach($item as $subItem) {
+                $this->addItemInCollection($collection, $subItem);
+            }
         }
-
-        return array_values($result);
     }
 
     /**
@@ -203,22 +144,6 @@ class ModelCollection implements ModelCollectionInterface
     }
 
     /**
-     * @param string $key
-     * @param mixed $value
-     * @return CollectionItemInterface|null
-     */
-    public function findByKey(string $key, $value): ?CollectionItemInterface
-    {
-        foreach($this as $item) {
-            if ($item->hasValueKey($key) && $item->assertValueByKey($key, $value)) {
-                return $item;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @param string $fieldName
      * @param $value
      * @return ModelInterface|null
@@ -228,21 +153,6 @@ class ModelCollection implements ModelCollectionInterface
         return $this->find(function ($item) use ($fieldName, $value) {
             return isset($item[$fieldName]) && $item[$fieldName] == $value;
         });
-    }
-
-    /**
-     * @param $fn
-     * @return ModelInterface|null
-     */
-    public function find($fn): ?CollectionItemInterface
-    {
-        foreach($this as $item) {
-            if ($fn($item) === true) {
-                return $item;
-            }
-        }
-
-        return null;
     }
 
     /**

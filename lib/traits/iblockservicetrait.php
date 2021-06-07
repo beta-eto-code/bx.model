@@ -46,4 +46,52 @@ trait IblockServiceTrait
         
         return $this->enumStorage[$code] = $this->getIblockPropertyEnumService()->getCollectionByCode($this, $code);
     }
+
+    /**
+     * @param string $idKey
+     * @param array $listData
+     * @param string ...$multiFieldsName
+     * @return array
+     */
+    protected function prepareFetchList(string $idKey, array $listData, string ...$multiFieldsName): array
+    {
+        $result = [];
+        $multiValues = [];
+
+        $firstItem = current($listData);
+        if (!isset($firstItem[$idKey])) {
+            return $listData;
+        }
+
+        foreach($listData as $item) {
+            $key = $item[$idKey];
+            $result[$key] = $item;
+
+            foreach($multiFieldsName as $fieldName) {
+                $value = $item[$fieldName];
+                if (empty($value)) {
+                    continue;
+                }
+
+                $multiValues[$key][$fieldName] = array_unique( 
+                    array_merge(
+                        (array)($multiValues[$key][$fieldName] ?? []), 
+                        (array)$value
+                    )
+                );
+            }    
+        }
+
+        foreach($result as $key => $item) {
+            if (empty($multiValues[$key])) {
+                continue;
+            }
+
+            foreach($multiValues[$key] as $fieldName => $multiValue) {
+                $result[$key][$fieldName] = $multiValue;
+            }
+        }
+
+        return array_values($result);
+    }
 }

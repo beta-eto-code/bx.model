@@ -11,4 +11,9 @@ interface ModelCollectionInterface extends CollectionInterface
      * @return ModelCollectionInterface
      */
     public function collection(string $key, string $className): ModelCollectionInterface;
+    /**
+     * @param array $modelData
+     * @return void
+     */
+    public function add(array $modelData);
 }

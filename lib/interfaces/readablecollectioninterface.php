@@ -36,6 +36,17 @@ interface ReadableCollectionInterface extends IteratorAggregate, Countable, Json
     public function unique(string $key, callable $fnModifier = null): array;
     /**
      * @param string $key
+     * @return GroupCollectionInterface[]|ReadableCollectionInterface
+     */
+    public function groupByKey(string $key): ReadableCollectionInterface;
+    /**
+     * @param string $key
+     * @param callable $fnCalcKeyValue - возвращает значение для группировки
+     * @return GroupCollectionInterface[]|ReadableCollectionInterface
+     */
+    public function group(string $key, callable $fnCalcKeyValue): ReadableCollectionInterface;
+    /**
+     * @param string $key
      * @param mixed $value
      * @return CollectionItemInterface[]|ReadableCollectionInterface
      */

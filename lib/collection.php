@@ -12,7 +12,7 @@ class Collection implements CollectionInterface
     /**
      * @var CollectionItemInterface[]|SplObjectStorage
      */
-    private $items;
+    protected $items;
 
     public function __construct(CollectionItemInterface ...$itemList)
     {
@@ -157,6 +157,48 @@ class Collection implements CollectionInterface
         if ($this->items->contains($item)) {
             $this->items->detach($item);
         }
+    }
+
+    /**
+     * @param string $key
+     * @return GroupCollectionInterface[]|ReadableCollectionInterface
+     */
+    public function groupByKey(string $key): ReadableCollectionInterface
+    {
+        $list = [];
+        foreach($this->items as $item) {
+            $index = $item->getValueByKey($key);
+            $list[$index][] = $item;
+        }
+
+        $collection = new Collection();
+        foreach($list as $index => $itemsList) {
+            $group = new GroupCollection($key, $index, ...$itemsList);
+            $collection->append($group);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param callable $fnCalcKeyValue - возвращает значение для группировки
+     * @return GroupCollectionInterface[]|ReadableCollectionInterface
+     */
+    public function group(string $key, callable $fnCalcKeyValue): ReadableCollectionInterface
+    {
+        $list = [];
+        foreach($this->items as $item) {
+            $index = $fnCalcKeyValue($item);
+            $list[$index][] = $item;
+        }
+
+        $collection = new Collection();
+        foreach($list as $index => $itemsList) {
+            $group = new GroupCollection($key, $index, ...$itemsList);
+            $collection->append($group);
+        }
+
+        return $collection;
     }
 
     /**
