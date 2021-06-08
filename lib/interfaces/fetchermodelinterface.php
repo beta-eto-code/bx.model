@@ -3,6 +3,7 @@
 namespace Bx\Model\Interfaces;
 
 use Bx\Model\ModelCollection;
+use Bx\Model\Interfaces\DerivativeModelInterface;
 
 interface FetcherModelInterface
 {
@@ -16,6 +17,11 @@ interface FetcherModelInterface
      * @return FetcherModelInterface
      */
     public function castTo(string $aggregateModelClass): FetcherModelInterface;
+    /**
+     * @param DerivativeModelInterface|string $derivativeModelClass
+     * @return FetcherModelInterface
+     */
+    public function loadAs(string $derivativeModelClass): FetcherModelInterface;
     /**
      * @param callable $fn
      * @return FetcherModelInterface

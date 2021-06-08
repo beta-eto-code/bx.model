@@ -68,6 +68,48 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
         return null;
     }
 
+     /**
+     * @param string $key
+     * @return GroupCollectionInterface[]|ReadableCollectionInterface
+     */
+    public function groupByKey(string $key): ReadableCollectionInterface
+    {
+        $list = [];
+        foreach($this->list as $item) {
+            $index = $item->getValueByKey($key);
+            $list[$index][] = $item;
+        }
+
+        $collection = new Collection();
+        foreach($list as $index => $itemsList) {
+            $group = new GroupCollection($key, $index, ...$itemsList);
+            $collection->append($group);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param callable $fnCalcKeyValue - возвращает значение для группировки
+     * @return GroupCollectionInterface[]|ReadableCollectionInterface
+     */
+    public function group(string $key, callable $fnCalcKeyValue): ReadableCollectionInterface
+    {
+        $list = [];
+        foreach($this->list as $item) {
+            $index = $fnCalcKeyValue($item);
+            $list[$index][] = $item;
+        }
+
+        $collection = new Collection();
+        foreach($list as $index => $itemsList) {
+            $group = new GroupCollection($key, $index, ...$itemsList);
+            $collection->append($group);
+        }
+
+        return $collection;
+    }
+
     /**
      * @param string $key
      * @param string|null $indexKey

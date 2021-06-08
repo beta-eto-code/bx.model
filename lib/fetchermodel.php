@@ -6,6 +6,7 @@ namespace Bx\Model;
 use Bx\Model\Interfaces\FetcherModelInterface;
 use Bx\Model\Interfaces\ModelServiceInterface;
 use Bx\Model\Interfaces\AggregateModelInterface;
+use Bx\Model\Interfaces\DerivativeModelInterface;
 use Bx\Model\Interfaces\QueryInterface;
 use Exception;
 
@@ -43,6 +44,10 @@ class FetcherModel implements FetcherModelInterface
      * @var AggregateModelInterface|string|null
      */
     private $classCast;
+    /**
+     * @var DerivativeModelInterface|string|null
+     */
+    private $loadAsClass;
     /**
      * @var QueryInterface
      */
@@ -132,6 +137,16 @@ class FetcherModel implements FetcherModelInterface
     }
 
     /**
+     * @param DerivativeModelInterface|string $derivativeModelClass
+     * @return FetcherModelInterface
+     */
+    public function loadAs(string $derivativeModelClass): FetcherModelInterface
+    {
+        $this->loadAsClass = $derivativeModelClass;
+        return $this;
+    }
+
+    /**
      * @param array $listKeyValues
      * @return ModelCollection
      */
@@ -157,6 +172,15 @@ class FetcherModel implements FetcherModelInterface
             if ($this->query->hasFetchList()) {
                 $params['fetch'] = $this->query->getFetchList();
             }
+        }
+
+        if (!empty($this->loadAsClass)) {
+            return $this->service->getModelCollection(
+                $this->loadAsClass, 
+                $params['filter'] ?? null, 
+                $params['order'] ?? null, 
+                $params['limit'] ?? null
+            );
         }
 
         return $this->service->getList($params);

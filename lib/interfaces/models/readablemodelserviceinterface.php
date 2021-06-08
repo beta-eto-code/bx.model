@@ -3,8 +3,10 @@
 namespace Bx\Model\Interfaces\Models;
 
 use Bx\Model\AbsOptimizedModel;
+use Bx\Model\Interfaces\ModelCollectionInterface;
 use Bx\Model\Interfaces\UserContextInterface;
 use Bx\Model\ModelCollection;
+use Bx\Model\Interfaces\DerivativeModelInterface;
 
 interface ReadableModelServiceInterface
 {
@@ -31,4 +33,13 @@ interface ReadableModelServiceInterface
      * @return AbsOptimizedModel|null
      */
     public function getById(int $id, UserContextInterface $userContext = null): ?AbsOptimizedModel;
+    /**
+     * Получаем коллекцию производных моделей
+     * @param DerivativeModelInterface $class
+     * @param array $filter
+     * @param array $sort
+     * @param int $limit
+     * @return DerivativeModelInterface[]|ModelCollectionInterface
+     */
+    public function getModelCollection(string $class, array $filter = null, array $sort = null, int $limit = null): ModelCollectionInterface;
 }
