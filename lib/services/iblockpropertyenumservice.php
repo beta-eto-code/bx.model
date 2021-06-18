@@ -55,6 +55,9 @@ class IblockPropertyEnumService extends BaseModelService implements IblockProper
 			'filter' => [
 				'=PROPERTY.IBLOCK_ID' => $iblockService->getIblockId(),
 				'=PROPERTY.CODE' => strtoupper($propertyCode),
+			],
+			'order' => [
+				'SORT' => 'asc',
 			]
 		]);
 	}

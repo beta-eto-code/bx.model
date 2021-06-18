@@ -23,7 +23,7 @@ interface UserServiceInterface extends ModelServiceInterface
     /**
      * @param User $user
      * @param string ...$keyListForSave
-     * @return void
+     * @return Result
      */
     public function saveExtendedData(User $user, string ...$keyListForSave): Result;
 
