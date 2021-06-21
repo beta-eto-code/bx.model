@@ -126,9 +126,13 @@ class QueryModel extends Query implements ModelQueryInterface
             return $this->totalCount;
         }
 
-        $params = [
+        $params = !empty($this->filter) ? [
             'filter' => $this->filter
-        ];
+        ] : [];
+
+        if (!empty($this->runtimeFields)) {
+            $params['runtime'] = $this->runtimeFields;
+        }
 
         return $this->modelService->getCount($params, $this->userContext);
     }
