@@ -3,7 +3,7 @@
 
 namespace Bx\Model\Interfaces;
 
-
+use Bitrix\Main\ORM\Fields\ExpressionField;
 use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\Models\PaginationInterface;
 
@@ -29,6 +29,18 @@ interface ModelQueryInterface extends QueryInterface
      * @return $this
      */
     public function loadPagination(array $params): self;
+    /**
+     * @param string $fieldName
+     * @param ExpressionField $expression
+     * @return self
+     */
+    public function setRuntimeField(string $fieldName, ExpressionField $expression): self;
+    /**
+     * @param string $fieldName
+     * @param ExpressionField $expression
+     * @return ExpressionField[]
+     */
+    public function getRuntimeFields(string $fieldName, ExpressionField $expression): array;
     /**
      * @param array $filter
      * @param string|null $prefix

@@ -3,7 +3,7 @@
 
 namespace Bx\Model;
 
-
+use Bitrix\Main\ORM\Fields\ExpressionField;
 use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\PaginationInterface;
@@ -20,6 +20,10 @@ class QueryModel extends Query implements ModelQueryInterface
      * @var UserContextInterface|null
      */
     private $userContext;
+    /**
+     * @var ExpressionField[]
+     */
+    private $runtimeFields;
 
     public function __construct(QueryableModelServiceInterface $modelService, UserContextInterface $userContext = null)
     {
@@ -66,7 +70,32 @@ class QueryModel extends Query implements ModelQueryInterface
             $params['select'] = $this->select;
         }
 
+        if (!empty($this->runtimeFields)) {
+            $params['runtime'] = $this->runtimeFields;
+        }
+
         return $this->modelService->getList($params, $this->userContext);
+    }
+
+    /**
+     * @param string $fieldName
+     * @param ExpressionField $expression
+     * @return self
+     */
+    public function setRuntimeField(string $fieldName, ExpressionField $expression): ModelQueryInterface
+    {
+        $this->runtimeFields[$fieldName] = $expression;
+        return $this;
+    }
+    
+    /**
+     * @param string $fieldName
+     * @param ExpressionField $expression
+     * @return ExpressionField[]
+     */
+    public function getRuntimeFields(string $fieldName, ExpressionField $expression): array
+    {
+        return (array)($this->runtimeFields ?? []);
     }
 
     /**
