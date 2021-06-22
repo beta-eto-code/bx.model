@@ -4,6 +4,7 @@
 namespace Bx\Model;
 
 use Bitrix\Main\ORM\Fields\ExpressionField;
+use Bitrix\Main\ORM\Fields\Field;
 use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\PaginationInterface;
@@ -79,21 +80,19 @@ class QueryModel extends Query implements ModelQueryInterface
 
     /**
      * @param string $fieldName
-     * @param ExpressionField $expression
+     * @param Field $expression
      * @return self
      */
-    public function setRuntimeField(string $fieldName, ExpressionField $expression): ModelQueryInterface
+    public function setRuntimeField(string $fieldName, Field $expression): ModelQueryInterface
     {
         $this->runtimeFields[$fieldName] = $expression;
         return $this;
     }
     
     /**
-     * @param string $fieldName
-     * @param ExpressionField $expression
-     * @return ExpressionField[]
+     * @return Field[]
      */
-    public function getRuntimeFields(string $fieldName, ExpressionField $expression): array
+    public function getRuntimeFields(): array
     {
         return (array)($this->runtimeFields ?? []);
     }
