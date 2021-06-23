@@ -39,6 +39,15 @@ class Collection implements CollectionInterface
     }
 
     /**
+     * @param callable $fn
+     * @return array
+     */
+    public function map(callable $fn): array
+    {
+        return array_map($fn, iterator_to_array($this->items));
+    }
+
+    /**
      * @return SplObjectStorage
      */
     public function getIterator()

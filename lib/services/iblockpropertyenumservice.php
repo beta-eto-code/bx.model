@@ -5,10 +5,12 @@ namespace Bx\Model\Services;
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Error;
 use Bitrix\Main\ObjectPropertyException;
+use Bitrix\Main\ORM\Objectify\Collection;
 use Bitrix\Main\Result;
 use Bitrix\Main\SystemException;
 use Bx\Model\AbsOptimizedModel;
 use Bx\Model\BaseModelService;
+use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Bx\Model\Interfaces\UserContextInterface;
 use Bx\Model\ModelCollection;
 use Bx\Model\Models\IblockPropertyEnum;
@@ -36,13 +38,81 @@ class IblockPropertyEnumService extends BaseModelService implements IblockProper
 			"DEF",
 			"SORT",
 			"XML_ID",
-			"TMP_ID"
+			"TMP_ID",
+            'PROPERTY_CODE' => 'PROPERTY.CODE',
 		];
 		$list = PropertyEnumerationTable::getList($params);
 
 		return new ModelCollection($list, IblockPropertyEnum::class);
 	}
 
+    /**
+     * @param int $propertyId
+     * @param int $elementId
+     * @return array
+     */
+	private function getListElementEnumValue(int $propertyId, int $elementId): array
+    {
+        $result = [];
+        $tableClass = "\\Bitrix\\Iblock\\Elements\\IblockProperty{$propertyId}Table";
+        $query = $tableClass::getList([
+            'filter' => [
+                '=IBLOCK_ELEMENT_ID' => $propertyId,
+                '=IBLOCK_PROPERTY_ID' => $elementId
+            ],
+        ]);
+
+        while ($value = $query->fetch()) {
+            $enumId = $value['VALUE'];
+            $result[$enumId] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $elementId
+     * @param ReadableCollectionInterface $enumCollection
+     * @param string|null $propertyCode
+     * @return Collection|null
+     * @throws ArgumentException
+     * @throws SystemException
+     */
+	public function createCollectionEnumValue(
+        int $elementId,
+        ReadableCollectionInterface $enumCollection,
+        string $propertyCode = null
+    ): ?Collection
+    {
+        if (!empty($propertyCode)) {
+            $enumCollection = $enumCollection->filterByKey('PROPERTY_CODE', $propertyCode);
+        };
+
+        $firstValue = $enumCollection->first();
+        $propertyId = $firstValue instanceof IblockPropertyEnum ? $firstValue->getPropertyId() : 0;
+        if (!$propertyId) {
+            return null;
+        }
+
+        $collectionClass = "\\Bitrix\\Iblock\\Elements\\EO_IblockProperty{$propertyId}_Collection";
+        $currentEnumValue = $this->getListElementEnumValue($propertyId, $elementId);
+        $filteredValues = $enumCollection->map(function (IblockPropertyEnum $enum) use ($elementId, $currentEnumValue) {
+            $enumId = $enum->getId();
+            $id = $currentEnumValue[$enumId]['ID'] ?? null;
+            return $enum->createElementObjectValue($elementId, $id);
+        });
+
+
+        /**
+         * @var Collection $result
+         */
+        $result = new $collectionClass;
+        foreach ($filteredValues as $value) {
+            $result->add($value);
+        }
+
+        return $result;
+    }
 
     /**
      * @param IblockServiceInterface $iblockService

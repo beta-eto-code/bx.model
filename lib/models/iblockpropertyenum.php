@@ -2,7 +2,10 @@
 
 namespace Bx\Model\Models;
 
+use Bitrix\Main\ORM\Objectify\EntityObject;
+use Bitrix\Main\ORM\Objectify\State;
 use Bx\Model\AbsOptimizedModel;
+use Bx\Model\Interfaces\ModelInterface;
 
 class IblockPropertyEnum extends AbsOptimizedModel
 {
@@ -22,6 +25,29 @@ class IblockPropertyEnum extends AbsOptimizedModel
 		];
 	}
 
+    /**
+     * @param ModelInterface $model
+     * @return EntityObject
+     */
+	public function createElementObjectValue(int $elementId, int $id = null): EntityObject
+    {
+        $class = "\\Bitrix\\Iblock\\Elements\\EO_IblockProperty{$this->getPropertyId()}";
+        /**
+         * @var EntityObject $element
+         */
+        $element = new $class;
+        $element['IBLOCK_ELEMENT_ID'] = $elementId;
+        $element['IBLOCK_PROPERTY_ID'] = $this->getPropertyId();
+        $element['VALUE'] = $this->getId();
+        $element['IBLOCK_GENERIC_VALUE'] = (string)$this->getId();
+
+        if ($id) {
+            $element['ID'] = $id;
+            $element->sysChangeState(State::CHANGED);
+        }
+
+        return $element;
+    }
 
 	/**
 	 * @return int

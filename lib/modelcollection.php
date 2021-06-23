@@ -98,15 +98,6 @@ class ModelCollection extends Collection implements ModelCollectionInterface
     }
 
     /**
-     * @param callable $fn
-     * @return array
-     */
-    public function map(callable $fn): array
-    {
-        return array_map($fn, iterator_to_array($this->items));
-    }
-
-    /**
      * @param string $key
      * @param mixed $value
      * @return ModelInterface[]|ModelCollection

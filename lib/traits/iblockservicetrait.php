@@ -2,6 +2,8 @@
 
 namespace Bx\Model\Traits;
 
+use Bitrix\Main\ORM\Objectify\Collection;
+use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\IblockPropertyEnumServiceInterface;
 use Bx\Model\Models\IblockPropertyEnum;
@@ -38,13 +40,41 @@ trait IblockServiceTrait
      * @param string $code
      * @return IblockPropertyEnum[]|ModelCollection
      */
-    public function getEnumCollection(string $code): ModelCollection
+    private function getInternalEnumCollection(string $code): ModelCollection
     {
         if (isset($this->enumStorage[$code]) && $this->enumStorage[$code] instanceof ModelCollection) {
             return $this->enumStorage[$code];
         }
-        
+
         return $this->enumStorage[$code] = $this->getIblockPropertyEnumService()->getCollectionByCode($this, $code);
+    }
+
+    /**
+     * @param string $code
+     * @param int ...$enumIdList
+     * @return IblockPropertyEnum[]|ReadableCollectionInterface
+     */
+    public function getEnumCollection(string $code, int ...$enumIdList): ReadableCollectionInterface
+    {
+        if (empty($enumIdList)) {
+            return $this->getInternalEnumCollection($code);
+        }
+
+        return $this->getInternalEnumCollection($code)->filter(function (IblockPropertyEnum $enum) use ($enumIdList) {
+            return in_array($enum->getId(), $enumIdList);
+        });
+    }
+
+    /**
+     * @param string $code
+     * @param int $elementId
+     * @param int ...$enumIdList
+     * @return Collection|null
+     */
+    public function createCollectionEnumValue(string $code, int $elementId, int ...$enumIdList): ?Collection
+    {
+        $enumCollection = $this->getEnumCollection($code, ...$enumIdList);
+        return $this->getIblockPropertyEnumService()->createCollectionEnumValue($elementId, $enumCollection);
     }
 
     /**

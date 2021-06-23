@@ -60,4 +60,10 @@ interface ReadableCollectionInterface extends IteratorAggregate, Countable, Json
      * @return CollectionItemInterface|null
      */
     public function first(): ?CollectionItemInterface;
+
+    /**
+     * @param callable $fn
+     * @return array
+     */
+    public function map(callable $fn): array;
 }
