@@ -2,6 +2,7 @@
 
 namespace Bx\Model\Services;
 
+use Bitrix\Iblock\ElementPropertyTable;
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Error;
 use Bitrix\Main\ObjectPropertyException;
@@ -65,50 +66,6 @@ class IblockPropertyEnumService extends BaseModelService implements IblockProper
         while ($value = $query->fetch()) {
             $enumId = $value['VALUE'];
             $result[$enumId] = $value;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param int $elementId
-     * @param ReadableCollectionInterface $enumCollection
-     * @param string|null $propertyCode
-     * @return Collection|null
-     * @throws ArgumentException
-     * @throws SystemException
-     */
-	public function createCollectionEnumValue(
-        int $elementId,
-        ReadableCollectionInterface $enumCollection,
-        string $propertyCode = null
-    ): ?Collection
-    {
-        if (!empty($propertyCode)) {
-            $enumCollection = $enumCollection->filterByKey('PROPERTY_CODE', $propertyCode);
-        };
-
-        $firstValue = $enumCollection->first();
-        $propertyId = $firstValue instanceof IblockPropertyEnum ? $firstValue->getPropertyId() : 0;
-        if (!$propertyId) {
-            return null;
-        }
-
-        $collectionClass = "\\Bitrix\\Iblock\\Elements\\EO_IblockProperty{$propertyId}_Collection";
-        $currentEnumValue = $this->getListElementEnumValue($propertyId, $elementId);
-        $filteredValues = $enumCollection->map(function (IblockPropertyEnum $enum) use ($elementId, $currentEnumValue) {
-            $enumId = $enum->getId();
-            $id = $currentEnumValue[$enumId]['ID'] ?? null;
-            return $enum->createElementObjectValue($elementId, $id);
-        });
-
-
-        /**
-         * @var Collection $result
-         */
-        $result = new $collectionClass;
-        foreach ($filteredValues as $value) {
-            $result->add($value);
         }
 
         return $result;

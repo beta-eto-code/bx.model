@@ -2,12 +2,16 @@
 
 namespace Bx\Model\Traits;
 
-use Bitrix\Main\ORM\Objectify\Collection;
+use Bitrix\Main\ArgumentException;
+use Bitrix\Main\ObjectPropertyException;
+use Bitrix\Main\SystemException;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\IblockPropertyEnumServiceInterface;
+use Bx\Model\Models\IblockProperty;
 use Bx\Model\Models\IblockPropertyEnum;
 use Bx\Model\Services\IblockPropertyEnumService;
+use Bx\Model\Services\IblockPropertyStorage;
 
 trait IblockServiceTrait
 {
@@ -19,11 +23,16 @@ trait IblockServiceTrait
      * @var IblockPropertyEnumServiceInterface
      */
     protected $iblockPropertyEnumService;
+    /**
+     * @var IblockPropertyStorage
+     */
+    protected $iblockPropertyStorage;
 
     /**
      * @return integer
      */
     abstract public function getIblockId(): int;
+
     /**
      * @return IblockPropertyEnumServiceInterface
      */
@@ -34,6 +43,18 @@ trait IblockServiceTrait
         }
 
         return $this->iblockPropertyEnumService = new IblockPropertyEnumService(); 
+    }
+
+    /**
+     * @return IblockPropertyStorage
+     */
+    protected function getIblockPropertyStorage(): IblockPropertyStorage
+    {
+        if ($this->iblockPropertyStorage instanceof IblockPropertyStorage) {
+            return $this->iblockPropertyStorage;
+        }
+
+        return $this->iblockPropertyStorage = new IblockPropertyStorage($this);
     }
 
     /**
@@ -63,18 +84,6 @@ trait IblockServiceTrait
         return $this->getInternalEnumCollection($code)->filter(function (IblockPropertyEnum $enum) use ($enumIdList) {
             return in_array($enum->getId(), $enumIdList);
         });
-    }
-
-    /**
-     * @param string $code
-     * @param int $elementId
-     * @param int ...$enumIdList
-     * @return Collection|null
-     */
-    public function createCollectionEnumValue(string $code, int $elementId, int ...$enumIdList): ?Collection
-    {
-        $enumCollection = $this->getEnumCollection($code, ...$enumIdList);
-        return $this->getIblockPropertyEnumService()->createCollectionEnumValue($elementId, $enumCollection);
     }
 
     /**
@@ -123,5 +132,36 @@ trait IblockServiceTrait
         }
 
         return array_values($result);
+    }
+
+    /**
+     * @param string ...$propertyCodes
+     * @return IblockProperty[]|ReadableCollectionInterface
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
+     */
+    public function getPropertiesDefinitionCollection(string ...$propertyCodes): ReadableCollectionInterface
+    {
+        $collection = $this->getIblockPropertyStorage()->getList();
+        if (!empty($propertyCodes)) {
+            $collection = $collection->filter(function (IblockProperty $property) use ($propertyCodes) {
+                return in_array($property->getCode(), $propertyCodes);
+            });
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param string $propertyCode
+     * @return IblockProperty|null
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
+     */
+    public function getPropertyDefinition(string $propertyCode): ?IblockProperty
+    {
+        return $this->getIblockPropertyStorage()->getList()->findByKey('CODE', $propertyCode);
     }
 }

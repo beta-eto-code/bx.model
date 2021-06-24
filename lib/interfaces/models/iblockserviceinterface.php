@@ -2,8 +2,8 @@
 
 namespace Bx\Model\Interfaces\Models;
 
-use Bitrix\Main\ORM\Objectify\Collection;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
+use Bx\Model\Models\IblockProperty;
 use Bx\Model\Models\IblockPropertyEnum;
 
 interface IblockServiceInterface
@@ -21,10 +21,14 @@ interface IblockServiceInterface
     public function getEnumCollection(string $code, int ...$enumIdList): ReadableCollectionInterface;
 
     /**
-     * @param string $code
-     * @param int $elementId
-     * @param int ...$enumIdList
-     * @return Collection|null
+     * @param string ...$propertyCodes
+     * @return IblockProperty[]|ReadableCollectionInterface
      */
-    public function createCollectionEnumValue(string $code, int $elementId, int ...$enumIdList): ?Collection;
+    public function getPropertiesDefinitionCollection(string ...$propertyCodes): ReadableCollectionInterface;
+
+    /**
+     * @param string $propertyCode
+     * @return IblockProperty|null
+     */
+    public function getPropertyDefinition(string $propertyCode): ?IblockProperty;
 }
