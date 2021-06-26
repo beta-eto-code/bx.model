@@ -7,6 +7,7 @@ use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Db\SqlQueryException;
 use Bitrix\Main\Error;
 use Bitrix\Main\ORM\Objectify\EntityObject;
+use Bitrix\Main\ORM\Objectify\State;
 use Bitrix\Main\Result;
 use Bitrix\Main\SystemException;
 use Bx\Model\Models\IblockProperty;
@@ -51,8 +52,22 @@ class IblockEntityObjectWrapper
                 if (!$elementId) {
                     return (new Result())->addError(new Error('Element Id is empty'));
                 }
+
                 $collection = $property->createEntityObjectValueCollection($elementId, ...(array)$value);
-                return $collection->save();
+                $oldCollection = $property->getEntityObjectTable()::getList([
+                    'filter' => [
+                        '=IBLOCK_ELEMENT_ID' => $elementId,
+                        '=IBLOCK_PROPERTY_ID' => $property->getId(),
+                    ],
+                ])->fetchCollection();
+                foreach ($oldCollection->getAll() as $bxObject) {
+                    $bxObject->delete();
+                }
+
+                foreach ($collection as $item) {
+                    //$item->sysChangeState(State::RAW);
+                    $this->iblockElementObject->addTo($property->getCode(), $item);
+                }
             };
         } else {
             $this->iblockElementObject->set($property->getCode(), $value);
@@ -75,19 +90,23 @@ class IblockEntityObjectWrapper
             return $result;
         }
 
-        foreach ($this->lazyUpdate as $fn) {
-            try {
-                /**
-                 * @var Result $resultSave
-                 */
-                $resultSave = $fn();
-                if (!$resultSave->isSuccess()) {
+        if (!empty($this->lazyUpdate)) {
+            foreach ($this->lazyUpdate as $fn) {
+                try {
+                    /**
+                     * @var Result $resultSave
+                     */
+                    $fn();
+                } catch (Throwable $e) {
                     $connection->rollbackTransaction();
-                    return $resultSave;
+                    return (new Result())->addError(new Error($e->getMessage()));
                 }
-            } catch (Throwable $e) {
+            }
+
+            $updateResult = $this->iblockElementObject->save();
+            if (!$updateResult->isSuccess()) {
                 $connection->rollbackTransaction();
-                return (new Result())->addError(new Error($e->getMessage()));
+                return $updateResult;
             }
         }
 

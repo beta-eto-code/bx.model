@@ -5,14 +5,14 @@ namespace Bx\Model\Services;
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\ObjectPropertyException;
 use Bitrix\Main\SystemException;
+use Bx\Model\Interfaces\IblockDefinitionStorageServiceInterface;
 use Bx\Model\Interfaces\ModelCollectionInterface;
-use Bx\Model\Interfaces\Models\IblockServiceInterface;
 use Bx\Model\Models\IblockProperty;
 
 class IblockPropertyStorage
 {
     /**
-     * @var IblockServiceInterface
+     * @var IblockDefinitionStorageServiceInterface
      */
     private $iblockService;
     /**
@@ -24,7 +24,10 @@ class IblockPropertyStorage
      */
     private $collection;
 
-    public function __construct(IblockServiceInterface $iblockService, IblockPropertyService $propertyService = null)
+    public function __construct(
+        IblockDefinitionStorageServiceInterface $iblockService,
+        IblockPropertyService $propertyService = null
+    )
     {
         $this->iblockService = $iblockService;
         $this->propertyService = $propertyService ?? new IblockPropertyService();
@@ -42,9 +45,10 @@ class IblockPropertyStorage
             return $this->collection;
         }
 
+        $iblockId = $this->iblockService->getIblockId();
         $this->collection = $this->propertyService->getList([
             'filter' => [
-                '=IBLOCK_ID' => $this->iblockService->getIblockId(),
+                '=IBLOCK_ID' => $iblockId,
             ],
         ]);
 

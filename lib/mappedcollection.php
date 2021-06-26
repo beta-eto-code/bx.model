@@ -156,13 +156,13 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed ...$value
      * @return CollectionItemInterface[]|ReadableCollectionInterface
      */
-    public function filterByKey(string $key, $value): ReadableCollectionInterface
+    public function filterByKey(string $key, ...$value): ReadableCollectionInterface
     {
         return $this->filter(function(CollectionItemInterface $item) use ($key, $value) {
-            return $item->hasValueKey($key) && $item->assertValueByKey($key, $value);
+            return $item->hasValueKey($key) && in_array($item->getValueByKey($key), (array)$value);
         });
     }
 
@@ -234,5 +234,10 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
         if (isset($this->list[$offset])) {
             unset($this->list[$offset]);
         }
+    }
+
+    public function map(callable $fn): array
+    {
+        return array_map($fn, $this->list);
     }
 }

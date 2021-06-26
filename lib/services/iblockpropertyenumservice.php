@@ -2,16 +2,13 @@
 
 namespace Bx\Model\Services;
 
-use Bitrix\Iblock\ElementPropertyTable;
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Error;
 use Bitrix\Main\ObjectPropertyException;
-use Bitrix\Main\ORM\Objectify\Collection;
 use Bitrix\Main\Result;
 use Bitrix\Main\SystemException;
 use Bx\Model\AbsOptimizedModel;
 use Bx\Model\BaseModelService;
-use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Bx\Model\Interfaces\UserContextInterface;
 use Bx\Model\ModelCollection;
 use Bx\Model\Models\IblockPropertyEnum;

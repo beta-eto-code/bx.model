@@ -2,6 +2,8 @@
 
 namespace Bx\Model\Interfaces\Models;
 
+use Bitrix\Main\ORM\Objectify\EntityObject;
+use Bx\Model\Interfaces\ModelInterface;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Bx\Model\Models\IblockProperty;
 use Bx\Model\Models\IblockPropertyEnum;

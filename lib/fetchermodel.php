@@ -200,6 +200,7 @@ class FetcherModel implements FetcherModelInterface
             return;
         }
 
+        $listKeyValues = array_unique($listKeyValues);
         $hasModifyCallback = $this->modifyCallback !== null;
         $linkedCollection = $this->getLinkedCollection($listKeyValues);
         foreach ($collection as $model) {

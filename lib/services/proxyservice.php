@@ -9,6 +9,7 @@ use Bitrix\Main\Result;
 use Bitrix\Main\Type\Date;
 use Bitrix\Main\Type\DateTime;
 use Bx\Model\AbsOptimizedModel;
+use Bx\Model\Interfaces\ModelCollectionInterface;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\ModelServiceInterface;
 use Bx\Model\Interfaces\UserContextInterface;
@@ -167,5 +168,10 @@ class ProxyService implements ModelServiceInterface
         }
 
         return [];
+    }
+
+    public function getModelCollection(string $class, array $filter = null, array $sort = null, int $limit = null): ModelCollectionInterface
+    {
+        return $this->originalService->getModelCollection($class, $filter, $sort, $limit);
     }
 }

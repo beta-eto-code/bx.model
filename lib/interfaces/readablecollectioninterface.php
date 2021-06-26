@@ -47,10 +47,10 @@ interface ReadableCollectionInterface extends IteratorAggregate, Countable, Json
     public function group(string $key, callable $fnCalcKeyValue): ReadableCollectionInterface;
     /**
      * @param string $key
-     * @param mixed $value
+     * @param ...$value
      * @return CollectionItemInterface[]|ReadableCollectionInterface
      */
-    public function filterByKey(string $key, $value): ReadableCollectionInterface;
+    public function filterByKey(string $key, ...$value): ReadableCollectionInterface;
     /**
      * @param callable $fn - attribute CollectionItemInterface
      * @return ReadableCollectionInterface

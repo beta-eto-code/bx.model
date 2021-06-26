@@ -99,14 +99,18 @@ class ModelCollection extends Collection implements ModelCollectionInterface
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed ...$value
      * @return ModelInterface[]|ModelCollection
      */
-    public function filterByKey(string $key, $value): ReadableCollectionInterface
+    public function filterByKey(string $key, ...$value): ReadableCollectionInterface
     {
         $newCollection = new static([], $this->className);
+        if (empty($value)) {
+            return $newCollection;
+        }
+
         foreach($this as $item) {
-            if ($item->hasValueKey($key) && $item->assertValueByKey($key, $value)) {
+            if ($item->hasValueKey($key) && in_array($item->getValueByKey($key), (array)$value)) {
                 $newCollection->append($item);
             }
         }

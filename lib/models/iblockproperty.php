@@ -4,6 +4,7 @@ namespace Bx\Model\Models;
 
 use Bitrix\Iblock\PropertyTable;
 use Bitrix\Main\ArgumentException;
+use Bitrix\Main\Entity\DataManager;
 use Bitrix\Main\ORM\Objectify\Collection;
 use Bitrix\Main\ORM\Objectify\EntityObject;
 use Bitrix\Main\ORM\Objectify\State;
@@ -54,9 +55,17 @@ class IblockProperty extends AbsOptimizedModel
     /**
      * @return string
      */
-	public function getEntityObjectClass(): string
+    public function getEntityObjectClass(): string
     {
         return "\\Bitrix\\Iblock\\Elements\\EO_IblockProperty{$this->getId()}";
+    }
+
+    /**
+     * @return DataManager|string
+     */
+    public function getEntityObjectTable(): string
+    {
+        return "\\Bitrix\\Iblock\\Elements\\IblockProperty{$this->getId()}Table";
     }
 
     /**

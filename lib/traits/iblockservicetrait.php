@@ -42,7 +42,7 @@ trait IblockServiceTrait
             return $this->iblockPropertyEnumService;
         }
 
-        return $this->iblockPropertyEnumService = new IblockPropertyEnumService(); 
+        return $this->iblockPropertyEnumService = new IblockPropertyEnumService();
     }
 
     /**
@@ -112,13 +112,13 @@ trait IblockServiceTrait
                     continue;
                 }
 
-                $multiValues[$key][$fieldName] = array_unique( 
+                $multiValues[$key][$fieldName] = array_unique(
                     array_merge(
-                        (array)($multiValues[$key][$fieldName] ?? []), 
+                        (array)($multiValues[$key][$fieldName] ?? []),
                         (array)$value
                     )
                 );
-            }    
+            }
         }
 
         foreach($result as $key => $item) {
