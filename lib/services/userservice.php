@@ -21,7 +21,6 @@ use Bx\Model\Traits\FilterableHelper;
 use Bx\Model\Traits\LimiterHelper;
 use Bx\Model\Traits\SortableHelper;
 use Bx\Model\UserContext;
-use Closure;
 use CUser;
 
 class UserService extends BaseModelService implements UserServiceInterface
@@ -105,6 +104,14 @@ class UserService extends BaseModelService implements UserServiceInterface
         return $fileList->first();
     }
 
+    /**
+     * @param int $id
+     * @param UserContextInterface|null $userContext
+     * @return Result
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
+     */
     public function delete(int $id, UserContextInterface $userContext = null): Result
     {
         $result = new Result();
@@ -215,6 +222,9 @@ class UserService extends BaseModelService implements UserServiceInterface
 
     /**
      * @return UserContextInterface|null
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
      */
     public function getCurrentUser(): ?UserContextInterface
     {

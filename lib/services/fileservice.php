@@ -2,7 +2,6 @@
 
 namespace Bx\Model\Services;
 
-use Bitrix\Crm\Settings\Mode;
 use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Error;
 use Bitrix\Main\ObjectPropertyException;
@@ -18,7 +17,6 @@ use Bx\Model\Models\File;
 use Bx\Model\Traits\FilterableHelper;
 use Bx\Model\Traits\LimiterHelper;
 use Bx\Model\Traits\SortableHelper;
-use BX\Router\Exceptions\ServerErrorException;
 use CFile;
 use Closure;
 use Psr\Http\Message\UploadedFileInterface;
@@ -106,7 +104,7 @@ class FileService extends BaseModelService implements FileServiceInterface
     public function getList(array $params, UserContextInterface $userContext = null): ModelCollection
     {
         if ($this->validateFn instanceof Closure) {
-            $params = $this->validateFn($params, $userContext);
+            $params = ($this->validateFn)($params, $userContext);
         }
 
         $fileList = FileTable::getList($params)->fetchAll();
@@ -124,7 +122,7 @@ class FileService extends BaseModelService implements FileServiceInterface
     public function getCount(array $params, UserContextInterface $userContext = null): int
     {
         if ($this->validateFn instanceof Closure) {
-            $params = $this->validateFn($params, $userContext);
+            $params = ($this->validateFn)($params, $userContext);
         }
 
         $params['count_total'] = true;
@@ -175,17 +173,20 @@ class FileService extends BaseModelService implements FileServiceInterface
      * @param AbsOptimizedModel $model
      * @param UserContextInterface|null $userContext
      * @return Result
-     * @throws ServerErrorException
+     * @throws Exception
      */
     public function save(AbsOptimizedModel $model, UserContextInterface $userContext = null): Result
     {
-        throw new ServerErrorException('Not implemented');
+        throw new Exception('Not implemented');
     }
 
     /**
      * @param string $baseDir
-     * @param array ...$fileDataList
+     * @param mixed ...$fileDataList
      * @return File[]|ModelCollection
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
      */
     private function internalSaveFiles(string $baseDir, array ...$fileDataList): ModelCollection
     {
@@ -209,6 +210,9 @@ class FileService extends BaseModelService implements FileServiceInterface
      * @param string $baseDir
      * @param string ...$filePaths
      * @return File[]|ModelCollection
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
      */
     public function saveFiles(string $baseDir, string ...$filePaths): ModelCollection
     {

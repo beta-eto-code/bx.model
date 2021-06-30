@@ -5,7 +5,6 @@ namespace Bx\Model\Models;
 use Bitrix\Main\ORM\Objectify\EntityObject;
 use Bitrix\Main\ORM\Objectify\State;
 use Bx\Model\AbsOptimizedModel;
-use Bx\Model\Interfaces\ModelInterface;
 
 class IblockPropertyEnum extends AbsOptimizedModel
 {
@@ -26,7 +25,8 @@ class IblockPropertyEnum extends AbsOptimizedModel
 	}
 
     /**
-     * @param ModelInterface $model
+     * @param int $elementId
+     * @param int|null $id
      * @return EntityObject
      */
 	public function createElementObjectValue(int $elementId, int $id = null): EntityObject

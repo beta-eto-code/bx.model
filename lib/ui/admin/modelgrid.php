@@ -429,7 +429,7 @@ class ModelGrid
     }
 
     /**
-     * @return ModelCollection
+     * @return AbsOptimizedModel[]|ModelCollection
      */
     public function getList(): ModelCollection
     {

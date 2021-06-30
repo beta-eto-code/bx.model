@@ -27,9 +27,9 @@ class NumberFilterField extends BaseFilterField
         $mTo = (int)$to-1;
 
         $type = $data[$this->id.'_numsel'] ?? null;
+        $filter = [];
         switch ($type) {
             case 'range':
-                $filter = [];
                 if (!empty($from)) {
                     $filter['from_'.$this->id] = $mFrom;
                 }
@@ -40,21 +40,18 @@ class NumberFilterField extends BaseFilterField
 
                 return $filter;
             case 'more':
-                $filter = [];
                 if (!empty($from)) {
                     $filter['from_'.$this->id] = $mFrom;
                 }
 
                 return $filter;
             case 'less':
-                $filter = [];
                 if (!empty($to)) {
                     $filter['to_'.$this->id] = $mTo;
                 }
 
                 return $filter;
             default:
-                $filter = [];
                 if (!empty($from)) {
                     $filter[$this->id] = $mFrom;
                 }

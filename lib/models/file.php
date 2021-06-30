@@ -5,6 +5,7 @@ namespace Bx\Model\Models;
 
 use Bx\Model\AbsOptimizedModel;
 use Bitrix\Main\Type\DateTime;
+use CFile;
 
 class File extends AbsOptimizedModel
 {
@@ -35,7 +36,7 @@ class File extends AbsOptimizedModel
 
     public function getSrc(): string
     {
-        return !empty($this->src) ? $this->src : (string)\CFile::GetFileSRC($this->data);
+        return !empty($this->src) ? $this->src : (string)CFile::GetFileSRC($this->data);
     }
 
     public function setSrc(string $path)
@@ -96,7 +97,7 @@ class File extends AbsOptimizedModel
      */
     public function setWidth(int $width)
     {
-        return $this['WIDTH'] = $width;
+        $this['WIDTH'] = $width;
     }
 
     /**

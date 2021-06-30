@@ -196,30 +196,6 @@ class IblockDefinitionService extends BaseModelService
 		        'value' => $model->getDescriptionType(),
 		        'isFill' => $model->hasValueKey('DESCRIPTION_TYPE'),
 		    ],
-		    'RSS_TTL' => [
-		        'value' => $model->getRssTtl(),
-		        'isFill' => $model->hasValueKey('RSS_TTL'),
-		    ],
-		    'RSS_ACTIVE' => [
-		        'value' => $model->getRssActive(),
-		        'isFill' => $model->hasValueKey('RSS_ACTIVE'),
-		    ],
-		    'RSS_FILE_ACTIVE' => [
-		        'value' => $model->getRssFileActive(),
-		        'isFill' => $model->hasValueKey('RSS_FILE_ACTIVE'),
-		    ],
-		    'RSS_FILE_LIMIT' => [
-		        'value' => $model->getRssFileLimit(),
-		        'isFill' => $model->hasValueKey('RSS_FILE_LIMIT'),
-		    ],
-		    'RSS_FILE_DAYS' => [
-		        'value' => $model->getRssFileDays(),
-		        'isFill' => $model->hasValueKey('RSS_FILE_DAYS'),
-		    ],
-		    'RSS_YANDEX_ACTIVE' => [
-		        'value' => $model->getRssYandexActive(),
-		        'isFill' => $model->hasValueKey('RSS_YANDEX_ACTIVE'),
-		    ],
 		    'XML_ID' => [
 		        'value' => $model->getXmlId(),
 		        'isFill' => $model->hasValueKey('XML_ID'),
@@ -284,22 +260,6 @@ class IblockDefinitionService extends BaseModelService
 		        'value' => $model->getEditFileAfter(),
 		        'isFill' => $model->hasValueKey('EDIT_FILE_AFTER'),
 		    ],
-		    'SECTIONS_NAME' => [
-		        'value' => $model->getSectionsName(),
-		        'isFill' => $model->hasValueKey('SECTIONS_NAME'),
-		    ],
-		    'SECTION_NAME' => [
-		        'value' => $model->getSectionName(),
-		        'isFill' => $model->hasValueKey('SECTION_NAME'),
-		    ],
-		    'ELEMENTS_NAME' => [
-		        'value' => $model->getElementsName(),
-		        'isFill' => $model->hasValueKey('ELEMENTS_NAME'),
-		    ],
-		    'ELEMENT_NAME' => [
-		        'value' => $model->getElementName(),
-		        'isFill' => $model->hasValueKey('ELEMENT_NAME'),
-		    ],
 		];
 		$data = [];
 		foreach($dataInfo as $name => $info) {
@@ -343,12 +303,6 @@ class IblockDefinitionService extends BaseModelService
 			"picture" => "PICTURE",
 			"description" => "DESCRIPTION",
 			"description_type" => "DESCRIPTION_TYPE",
-			"rss_ttl" => "RSS_TTL",
-			"rss_active" => "RSS_ACTIVE",
-			"rss_file_active" => "RSS_FILE_ACTIVE",
-			"rss_file_limit" => "RSS_FILE_LIMIT",
-			"rss_file_days" => "RSS_FILE_DAYS",
-			"rss_yandex_active" => "RSS_YANDEX_ACTIVE",
 			"xml_id" => "XML_ID",
 			"tmp_id" => "TMP_ID",
 			"index_element" => "INDEX_ELEMENT",
@@ -365,10 +319,6 @@ class IblockDefinitionService extends BaseModelService
 			"socnet_group_id" => "SOCNET_GROUP_ID",
 			"edit_file_before" => "EDIT_FILE_BEFORE",
 			"edit_file_after" => "EDIT_FILE_AFTER",
-			"sections_name" => "SECTIONS_NAME",
-			"section_name" => "SECTION_NAME",
-			"elements_name" => "ELEMENTS_NAME",
-			"element_name" => "ELEMENT_NAME",
 		];
 	}
 
@@ -395,12 +345,6 @@ class IblockDefinitionService extends BaseModelService
 			"picture" => "PICTURE",
 			"description" => "DESCRIPTION",
 			"description_type" => "DESCRIPTION_TYPE",
-			"rss_ttl" => "RSS_TTL",
-			"rss_active" => "RSS_ACTIVE",
-			"rss_file_active" => "RSS_FILE_ACTIVE",
-			"rss_file_limit" => "RSS_FILE_LIMIT",
-			"rss_file_days" => "RSS_FILE_DAYS",
-			"rss_yandex_active" => "RSS_YANDEX_ACTIVE",
 			"xml_id" => "XML_ID",
 			"tmp_id" => "TMP_ID",
 			"index_element" => "INDEX_ELEMENT",
@@ -417,10 +361,6 @@ class IblockDefinitionService extends BaseModelService
 			"socnet_group_id" => "SOCNET_GROUP_ID",
 			"edit_file_before" => "EDIT_FILE_BEFORE",
 			"edit_file_after" => "EDIT_FILE_AFTER",
-			"sections_name" => "SECTIONS_NAME",
-			"section_name" => "SECTION_NAME",
-			"elements_name" => "ELEMENTS_NAME",
-			"element_name" => "ELEMENT_NAME",
 		];
 	}
 }

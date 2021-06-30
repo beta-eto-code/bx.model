@@ -4,6 +4,7 @@ namespace Bx\Model;
 
 use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
+use Bx\Model\Interfaces\GroupCollectionInterface;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use SplObjectStorage;
 
@@ -100,7 +101,7 @@ class Collection implements CollectionInterface
 
     /**
      * @param string $key
-     * @param callable $fn - attribute is mixed value by the key of the collection item
+     * @param callable|null $fnModifier - attribute is mixed value by the key of the collection item
      * @return array
      */
     public function unique(string $key, callable $fnModifier = null): array

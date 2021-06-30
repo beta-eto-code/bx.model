@@ -5,6 +5,7 @@ namespace Bx\Model;
 use ArrayAccess;
 use ArrayIterator;
 use Bx\Model\Interfaces\CollectionItemInterface;
+use Bx\Model\Interfaces\GroupCollectionInterface;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Exception;
 use Iterator;
@@ -139,7 +140,7 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
 
     /**
      * @param string $key
-     * @param callable $fn - attribute is mixed value by the key of the collection item
+     * @param callable|null $fnModifier - attribute is mixed value by the key of the collection item
      * @return array
      */
     public function unique(string $key, callable $fnModifier = null): array
@@ -210,9 +211,13 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
         return $result;
     }
 
-    public function offsetExists($offset)
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
+    public function offsetExists($offset): bool
     {
-        return isset($this->list[$offset]) ? true : false;
+        return isset($this->list[$offset]);
     }
 
     public function offsetGet($offset)
@@ -220,6 +225,11 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
         return  $this->list[$offset] ?? null;
     }
 
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     * @throws Exception
+     */
     public function offsetSet($offset, $value)
     {
         if (!($value instanceof CollectionItemInterface)) {

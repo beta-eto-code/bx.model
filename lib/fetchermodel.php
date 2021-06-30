@@ -25,10 +25,6 @@ class FetcherModel implements FetcherModelInterface
      */
     private $destKey;
     /**
-     * @var array
-     */
-    private $addFilter;
-    /**
      * @var string
      */
     private $keySave;
@@ -236,16 +232,17 @@ class FetcherModel implements FetcherModelInterface
     }
 
     /**
-     * @param string $class
+     * @param AggregateModelInterface|string $aggregateModelClass
      * @return FetcherModelInterface
+     * @throws Exception
      */
-    public function castTo(string $class): FetcherModelInterface
+    public function castTo(string $aggregateModelClass): FetcherModelInterface
     {
-        if (!class_exists($class)) {
-            throw new Exception("{$class} is not found!");
+        if (!class_exists($aggregateModelClass)) {
+            throw new Exception("{$aggregateModelClass} is not found!");
         }
 
-        $this->classCast = $class;
+        $this->classCast = $aggregateModelClass;
         return $this;
     }
 

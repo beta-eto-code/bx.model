@@ -4,7 +4,6 @@
 namespace Bx\Model;
 
 use Bx\Model\Interfaces\FetcherModelInterface;
-use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Bx\Model\Interfaces\UserContextInterface;
 
 abstract class BaseLinkedModelService extends BaseModelService

@@ -30,7 +30,6 @@ class ModelCollection extends Collection implements ModelCollectionInterface
         foreach ($list as $item) {
             if ($item instanceof $className) {
                 $this->items->attach($item);
-                continue;
             } elseif(is_array($item) || $item instanceof Traversable) {
                 $this->items->attach(new $className($item));
             }

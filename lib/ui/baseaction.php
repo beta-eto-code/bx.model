@@ -4,8 +4,6 @@
 namespace Bx\Model\UI;
 
 
-use Bitrix\Main\Grid\Panel\Actions;
-use Bitrix\Main\Grid\Panel\Snippet\Onchange;
 use Closure;
 
 abstract class BaseAction

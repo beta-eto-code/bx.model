@@ -3,6 +3,7 @@
 namespace Bx\Model\Services;
 
 use Bitrix\Main\ArgumentException;
+use Bitrix\Main\Entity\DataManager;
 use Bitrix\Main\Error;
 use Bitrix\Main\ObjectPropertyException;
 use Bitrix\Main\Result;
@@ -48,10 +49,16 @@ class IblockPropertyEnumService extends BaseModelService implements IblockProper
      * @param int $propertyId
      * @param int $elementId
      * @return array
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
      */
 	private function getListElementEnumValue(int $propertyId, int $elementId): array
     {
         $result = [];
+        /**
+         * @var DataManager $tableClass
+         */
         $tableClass = "\\Bitrix\\Iblock\\Elements\\IblockProperty{$propertyId}Table";
         $query = $tableClass::getList([
             'filter' => [
@@ -72,6 +79,9 @@ class IblockPropertyEnumService extends BaseModelService implements IblockProper
      * @param IblockServiceInterface $iblockService
      * @param string $propertyCode
      * @return IblockPropertyEnum[]|ModelCollection
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
      */
     public function getCollectionByCode(IblockServiceInterface $iblockService, string $propertyCode): ModelCollection
 	{

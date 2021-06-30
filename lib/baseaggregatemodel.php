@@ -3,6 +3,7 @@
 namespace Bx\Model;
 
 use Bx\Model\Interfaces\AggregateModelInterface;
+use Exception;
 
 abstract class BaseAggregateModel extends AbsOptimizedModel implements AggregateModelInterface
 {
@@ -14,6 +15,7 @@ abstract class BaseAggregateModel extends AbsOptimizedModel implements Aggregate
     /**
      * @param ModelCollection $modelCollection
      * @param array $data
+     * @throws Exception
      */
     public function __construct(ModelCollection $modelCollection, array $data = [])
     {
@@ -24,6 +26,7 @@ abstract class BaseAggregateModel extends AbsOptimizedModel implements Aggregate
     /**
      * @param ModelCollection $modelCollection
      * @return AggregateModelInterface
+     * @throws Exception
      */
     public static function init(ModelCollection $modelCollection): AggregateModelInterface
     {

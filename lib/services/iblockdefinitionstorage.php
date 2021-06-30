@@ -169,6 +169,7 @@ class IblockDefinitionStorage implements IblockDefinitionStorageServiceInterface
      * @throws ArgumentException
      * @throws ObjectPropertyException
      * @throws SystemException
+     * @throws Exception
      */
     public function createWrappedEntityObject(int $id = null, ModelInterface $model = null): ?IblockEntityObjectWrapper
     {

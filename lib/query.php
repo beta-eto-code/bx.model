@@ -71,7 +71,7 @@ class Query implements QueryInterface
     }
 
     /**
-     * @param integer $limit
+     * @param array $sort
      * @return $this
      */
     public function setSort(array $sort): QueryInterface

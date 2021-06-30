@@ -7,7 +7,6 @@ namespace Bx\Model;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\PaginationInterface;
 use Bx\Model\Interfaces\QueryInterface;
-use JsonSerializable;
 
 class Pagination implements PaginationInterface
 {

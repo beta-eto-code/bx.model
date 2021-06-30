@@ -4,6 +4,8 @@
 namespace Bx\Model\UI;
 
 
+use CUtil;
+
 class GridActions
 {
     /**
@@ -14,7 +16,7 @@ class GridActions
     public function __construct(string $code)
     {
         $this->code = $code;
-        \CUtil::InitJSCore(['model.ui']);
+        CUtil::InitJSCore(['model.ui']);
     }
 
     /**

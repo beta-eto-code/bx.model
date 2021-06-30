@@ -21,6 +21,10 @@ class IblockPropertyEnumStorage implements IblockPropertyEnumStorageInterface
      * @var array
      */
     private $enumStorage;
+    /**
+     * @var IblockPropertyEnumServiceInterface
+     */
+    private $iblockPropertyEnumService;
 
     public function __construct(
         IblockDefinitionStorageServiceInterface $iblockDefinitionStorage,

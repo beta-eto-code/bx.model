@@ -4,6 +4,7 @@
 namespace Bx\Model;
 
 use Bx\Model\Interfaces\ModelCollectionInterface;
+use Bx\Model\Interfaces\ModelInterface;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\ModelServiceInterface;
 use Bx\Model\Traits\FilterableHelper;
@@ -39,10 +40,10 @@ abstract class BaseModelService implements ModelServiceInterface
     }
 
     /**
-     * @param DerivativeModelInterface $class
-     * @param array $filter
-     * @param array $sort
-     * @param integer $limit
+     * @param DerivativeModelInterface|string $class
+     * @param array|null $filter
+     * @param array|null $sort
+     * @param integer|null $limit
      * @return ModelCollectionInterface
      */
     public function getModelCollection(string $class, array $filter = null, array $sort = null, int $limit = null): ModelCollectionInterface
@@ -71,6 +72,10 @@ abstract class BaseModelService implements ModelServiceInterface
         }
         
         $fetchList = $class::getFetchList();
+
+        /**
+         * @var ModelInterface[]|ModelCollection $collection
+         */
         $collection = $this->getList($params);
         foreach ($fetchList as $fetcher) {
             if ($fetcher instanceof FetcherModelInterface) {

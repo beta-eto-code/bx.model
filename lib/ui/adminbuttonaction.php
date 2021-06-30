@@ -24,6 +24,10 @@ class AdminButtonAction extends BaseAdminButton
      * @var string
      */
     private $jsString;
+    /**
+     * @var string
+     */
+    public $link;
 
     public function __construct(GridActions $actionHelper, string $title, string $action, string $icon = '')
     {

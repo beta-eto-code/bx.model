@@ -6,6 +6,7 @@ namespace Bx\Model\UI;
 
 use Bitrix\Main\Grid\Panel\Actions;
 use Bitrix\Main\Grid\Panel\Snippet\Onchange;
+use Closure;
 
 class GroupAction extends BaseAction
 {
@@ -43,7 +44,7 @@ class GroupAction extends BaseAction
 
     public function exec(array $ids)
     {
-        if ($this->callback instanceof \Closure) {
+        if ($this->callback instanceof Closure) {
             $callback = $this->callback;
             $callback($ids);
         }

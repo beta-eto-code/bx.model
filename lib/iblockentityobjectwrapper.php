@@ -7,7 +7,6 @@ use Bitrix\Main\ArgumentException;
 use Bitrix\Main\Db\SqlQueryException;
 use Bitrix\Main\Error;
 use Bitrix\Main\ORM\Objectify\EntityObject;
-use Bitrix\Main\ORM\Objectify\State;
 use Bitrix\Main\Result;
 use Bitrix\Main\SystemException;
 use Bx\Model\Models\IblockProperty;
@@ -65,7 +64,6 @@ class IblockEntityObjectWrapper
                 }
 
                 foreach ($collection as $item) {
-                    //$item->sysChangeState(State::RAW);
                     $this->iblockElementObject->addTo($property->getCode(), $item);
                 }
             };

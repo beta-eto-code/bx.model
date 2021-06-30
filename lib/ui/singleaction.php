@@ -4,6 +4,8 @@
 namespace Bx\Model\UI;
 
 
+use Closure;
+
 class SingleAction extends BaseAction
 {
     public function toArray(int $id): array
@@ -29,7 +31,7 @@ class SingleAction extends BaseAction
 
     public function exec(int $id)
     {
-        if ($this->callback instanceof \Closure) {
+        if ($this->callback instanceof Closure) {
             $callback = $this->callback;
             $callback($id);
         }
