@@ -731,7 +731,7 @@ $grid->addColumn('article', 'Артикул');
 $grid->addColumn('date_create', 'Дата создания');
 $grid->addCalculateColumn(
     'status', 
-    funtion(ExtendedCatalogProduct $product) {
+    function(ExtendedCatalogProduct $product) {
         return $product->getStatusName();
     },
     'Статус'
