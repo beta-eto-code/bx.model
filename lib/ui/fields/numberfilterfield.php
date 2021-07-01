@@ -53,11 +53,11 @@ class NumberFilterField extends BaseFilterField
                 return $filter;
             default:
                 if (!empty($from)) {
-                    $filter[$this->id] = $mFrom;
+                    $filter[$this->id] = $from;
                 }
 
                 if (!empty($to)) {
-                    $filter[$this->id] = $mTo;
+                    $filter[$this->id] = $to;
                 }
 
                 return $filter;
