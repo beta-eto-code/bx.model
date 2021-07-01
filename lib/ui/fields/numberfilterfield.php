@@ -23,8 +23,8 @@ class NumberFilterField extends BaseFilterField
         $data = $this->getOptionsFilter($options);
         $from = $data[$this->id.'_from'] ?? null;
         $to = $data[$this->id.'_to'] ?? null;
-        $mFrom = (int)$from+1;
-        $mTo = (int)$to-1;
+        $mFrom = (int)$from;
+        $mTo = (int)$to;
 
         $type = $data[$this->id.'_numsel'] ?? null;
         $filter = [];
