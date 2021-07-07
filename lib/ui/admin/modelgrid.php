@@ -134,6 +134,14 @@ class ModelGrid
      * @var UserContextInterface
      */
     private $userContext;
+    /**
+     * @var callable
+     */
+    private $defaultRowLinkFunction;
+    /**
+     * @var string
+     */
+    private $defaultRowLinkTitle;
 
     public function __construct(ModelServiceInterface $modelService, string $code, string $primaryKey = 'ID')
     {
@@ -429,6 +437,16 @@ class ModelGrid
     }
 
     /**
+     * @param callable $fnCalcLink
+     * @param string|null $linkTitle
+     */
+    public function setDefaultRowLinkByCallback(callable $fnCalcLink,  ?string $linkTitle = '')
+    {
+        $this->defaultRowLinkFunction = $fnCalcLink;
+        $this->defaultRowLinkTitle = $linkTitle;
+    }
+
+    /**
      * @return AbsOptimizedModel[]|ModelCollection
      */
     public function getList(): ModelCollection
@@ -499,7 +517,17 @@ class ModelGrid
                     $rowViews[$column->id] = $value;
                 }
             }
-            $row = $this->grid->AddRow((int)$model[$this->primaryKey], $rowData);
+
+            if(!is_null($this->defaultRowLinkFunction) && is_callable($this->defaultRowLinkFunction)) {
+                $link = call_user_func($this->defaultRowLinkFunction, $model);
+            }
+            else {
+                $link = false;
+            }
+
+            $title = $this->defaultRowLinkTitle ?: ($link ? 'Перейти' : false);
+
+            $row = $this->grid->AddRow((int)$model[$this->primaryKey], $rowData, $link, $title);
             foreach ($rowViews as $id => $view) {
                 $row->AddViewField($id, $view);
             }
