@@ -772,6 +772,18 @@ $grid->setGroupAction('Опубликовать', 'accept')
         }
     });
 
+/**
+ * Добавляем кнопку в шапку справа от фильтра (вторая и последующие добавятся как выпадающее меню)
+ */
+$grid->addAdminButtonLink('Добавить', '/bitrix/admin/product_detail.php?lang='.LANG, 'btn_new');
+
+/**
+ * Добавляем ссылку на строку таблицы (переход по двойному клику мышкой)
+ * Если не задать title, по умолчанию будет Перейти
+ */
+$grid->setDefaultRowLinkTemplate('/bitrix/admin/product_detail.php?id=#ID#');
+$grid->setDefaultRowLinkTitle('Изменить');
+
 require($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_admin_after.php');
 $grid->show();  // показываем собранную таблицу
 

@@ -134,6 +134,14 @@ class ModelGrid
      * @var UserContextInterface
      */
     private $userContext;
+    /**
+     * @var string
+     */
+    private $defaultRowLinkTemplate;
+    /**
+     * @var string
+     */
+    private $defaultRowLinkTitle;
 
     public function __construct(ModelServiceInterface $modelService, string $code, string $primaryKey = 'ID')
     {
@@ -429,6 +437,32 @@ class ModelGrid
     }
 
     /**
+     * @param string $linkTemplate
+     */
+    public function setDefaultRowLinkTemplate(string $linkTemplate)
+    {
+        if($linkTemplate) {
+            $this->defaultRowLinkTemplate = $linkTemplate;
+        }
+        else {
+            $this->defaultRowLinkTemplate = '';
+        }
+    }
+
+    /**
+     * @param string $linkTitle
+     */
+    public function setDefaultRowLinkTitle(string $linkTitle)
+    {
+        if($linkTitle) {
+            $this->defaultRowLinkTitle = $linkTitle;
+        }
+        else {
+            $this->defaultRowLinkTitle = '';
+        }
+    }
+
+    /**
      * @return AbsOptimizedModel[]|ModelCollection
      */
     public function getList(): ModelCollection
@@ -499,7 +533,31 @@ class ModelGrid
                     $rowViews[$column->id] = $value;
                 }
             }
-            $row = $this->grid->AddRow((int)$model[$this->primaryKey], $rowData);
+
+            if($this->defaultRowLinkTemplate) {
+                $link = $this->defaultRowLinkTemplate;
+
+                preg_match_all('/#(.+?)#/ui', $this->defaultRowLinkTemplate, $matches);
+                $replaces = [];
+                if($matches && $matches[1]) {
+                    foreach ($matches[1] as $replaceKey) {
+                        if(isset($rowData[$replaceKey])) {
+                            $replaces['#'.$replaceKey.'#'] = (string)$rowData[$replaceKey];
+                        }
+                    }
+                }
+
+                if($replaces) {
+                    $link = str_replace(array_keys($replaces), array_values($replaces), $link);
+                }
+            }
+            else {
+                $link = false;
+            }
+
+            $title = $this->defaultRowLinkTitle ?: ($link ? 'Перейти' : false);
+
+            $row = $this->grid->AddRow((int)$model[$this->primaryKey], $rowData, $link, $title);
             foreach ($rowViews as $id => $view) {
                 $row->AddViewField($id, $view);
             }
