@@ -135,9 +135,9 @@ class ModelGrid
      */
     private $userContext;
     /**
-     * @var string
+     * @var callable
      */
-    private $defaultRowLinkTemplate;
+    private $defaultRowLinkFunction;
     /**
      * @var string
      */
@@ -437,29 +437,13 @@ class ModelGrid
     }
 
     /**
-     * @param string $linkTemplate
+     * @param callable $fnCalcLink
+     * @param string|null $linkTitle
      */
-    public function setDefaultRowLinkTemplate(string $linkTemplate)
+    public function setDefaultRowLinkByCallback(callable $fnCalcLink,  ?string $linkTitle = '')
     {
-        if($linkTemplate) {
-            $this->defaultRowLinkTemplate = $linkTemplate;
-        }
-        else {
-            $this->defaultRowLinkTemplate = '';
-        }
-    }
-
-    /**
-     * @param string $linkTitle
-     */
-    public function setDefaultRowLinkTitle(string $linkTitle)
-    {
-        if($linkTitle) {
-            $this->defaultRowLinkTitle = $linkTitle;
-        }
-        else {
-            $this->defaultRowLinkTitle = '';
-        }
+        $this->defaultRowLinkFunction = $fnCalcLink;
+        $this->defaultRowLinkTitle = $linkTitle;
     }
 
     /**
@@ -534,22 +518,8 @@ class ModelGrid
                 }
             }
 
-            if($this->defaultRowLinkTemplate) {
-                $link = $this->defaultRowLinkTemplate;
-
-                preg_match_all('/#(.+?)#/ui', $this->defaultRowLinkTemplate, $matches);
-                $replaces = [];
-                if($matches && $matches[1]) {
-                    foreach ($matches[1] as $replaceKey) {
-                        if(isset($rowData[$replaceKey])) {
-                            $replaces['#'.$replaceKey.'#'] = (string)$rowData[$replaceKey];
-                        }
-                    }
-                }
-
-                if($replaces) {
-                    $link = str_replace(array_keys($replaces), array_values($replaces), $link);
-                }
+            if(!is_null($this->defaultRowLinkFunction) && is_callable($this->defaultRowLinkFunction)) {
+                $link = call_user_func($this->defaultRowLinkFunction, $model);
             }
             else {
                 $link = false;
