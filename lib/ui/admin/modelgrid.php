@@ -579,14 +579,21 @@ class ModelGrid
             $this->grid->DisplayFilter($filterFields);
         }
 
-        $this->grid->DisplayList([
-            'ACTION_PANEL' => [
+        $listParams = [];
+        $groupActions = $this->getFormattedGroupActions();
+        if($groupActions) {
+            $listParams['ACTION_PANEL'] = [
                 'GROUPS' => [
-                    'TYPE' => [
-                        'ITEMS' => $this->getFormattedGroupActions()
+                    'TYPE' =>  [
+                        'ITEMS' => $groupActions
                     ],
                 ],
-            ],
-        ]);
+            ];
+        }
+        else {
+            $listParams['ACTION_PANEL'] = [];
+        }
+
+        $this->grid->DisplayList($listParams);
     }
 }
