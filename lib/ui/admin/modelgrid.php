@@ -8,6 +8,7 @@ use Bitrix\Main\Application;
 use Bitrix\Main\UI\Filter\Options;
 use Bitrix\Main\UI\PageNavigation;
 use Bx\Model\AbsOptimizedModel;
+use Bx\Model\Interfaces\ModelInterface;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\ModelServiceInterface;
 use Bx\Model\Interfaces\UserContextInterface;
@@ -436,11 +437,39 @@ class ModelGrid
         return $this->menu[] = new AdminButtonAction($this->actionHelper, $title, $action, $icon);
     }
 
+
+    /**
+     * @param string $linkTemplate
+     * @param string|null $linkTitle
+     */
+    public function setDefaultRowLinkTemplate(string $linkTemplate, ?string $linkTitle = null)
+    {
+        $this->setDefaultRowLinkByCallback(
+            function (ModelInterface $model) use ($linkTemplate) {
+                $link = $linkTemplate;
+                preg_match_all('/#(.+?)#/ui', $link, $matches);
+                $replaces = [];
+                if($matches && $matches[1]) {
+                    foreach ($matches[1] as $replaceKey) {
+                        if($model->hasValueKey($replaceKey)) {
+                            $replaces['#'.$replaceKey.'#'] = (string)$model->getValueByKey($replaceKey);
+                        }
+                    }
+                }
+                if($replaces) {
+                    $link = str_replace(array_keys($replaces), array_values($replaces), $link);
+                }
+                return $link;
+            },
+            $linkTitle
+        );
+    }
+
     /**
      * @param callable $fnCalcLink
      * @param string|null $linkTitle
      */
-    public function setDefaultRowLinkByCallback(callable $fnCalcLink,  ?string $linkTitle = '')
+    public function setDefaultRowLinkByCallback(callable $fnCalcLink, ?string $linkTitle = null)
     {
         $this->defaultRowLinkFunction = $fnCalcLink;
         $this->defaultRowLinkTitle = $linkTitle;

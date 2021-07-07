@@ -780,10 +780,9 @@ $grid->addAdminButtonLink('Добавить', '/bitrix/admin/product_detail.php?
 /**
  * Добавляем ссылку на строку таблицы (переход по двойному клику мышкой)
  * Если не задать второй аргумент title, по умолчанию будет Перейти
+ * Если шаблон не подходит, можно использовать setDefaultRowLinkByCallback(callable $fnCalcLink, ?string $linkTitle = null)
  */
-$grid->setDefaultRowLinkByCallback(function (ExtendedCatalogProduct $product) {
-    return '/bitrix/admin/product_detail.php?id='.$product->getId();
-}, 'Изменить');
+$grid->setDefaultRowLinkTemplate('/bitrix/admin/product_detail.php?id=#ID#', 'Изменить');
 
 require($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_admin_after.php');
 $grid->show();  // показываем собранную таблицу
