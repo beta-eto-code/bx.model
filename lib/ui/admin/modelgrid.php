@@ -605,13 +605,23 @@ class ModelGrid
             $groupAction = $this->groupActions[$action] ?? null;
             if ($groupAction instanceof GroupAction) {
                 $ids = (array)($this->request->getPost('id') ?? []);
-                $groupAction->exec($ids);
+                try {
+                    $groupAction->exec($ids);
+                }
+                catch (\Throwable $e) {
+                    $this->grid->AddGroupError($e->getMessage());
+                }
             }
         } else {
             $singleAction = $this->singleActions[$action];
             if ($singleAction instanceof SingleAction) {
                 $id = (int)$this->request->getPost('id');
-                $singleAction->exec($id);
+                try {
+                    $singleAction->exec($id);
+                }
+                catch (\Throwable $e) {
+                    $this->grid->AddUpdateError($e->getMessage(), $id);
+                }
             }
         }
     }
