@@ -608,7 +608,7 @@ class ModelGrid
                 try {
                     $groupAction->exec($ids);
                 }
-                catch (\Exception $e) {
+                catch (\Throwable $e) {
                     $this->grid->AddGroupError($e->getMessage());
                 }
             }
@@ -619,7 +619,7 @@ class ModelGrid
                 try {
                     $singleAction->exec($id);
                 }
-                catch (\Exception $e) {
+                catch (\Throwable $e) {
                     $this->grid->AddUpdateError($e->getMessage(), $id);
                 }
             }
