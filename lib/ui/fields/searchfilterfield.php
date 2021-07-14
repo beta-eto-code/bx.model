@@ -23,7 +23,7 @@ class SearchFilterField extends StringFilterField
     {
         $find = $options->getFilter()['FIND'] ?? null;
         if (!empty($find)) {
-            return ['like_'.$this->id => $find];
+            return ['like_'.$this->prefix.$this->id => $find];
         }
 
         return parent::getFilterField($options);

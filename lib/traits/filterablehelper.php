@@ -54,11 +54,17 @@ trait FilterableHelper
             }
 
             if ($this->allowForFilter($key)) {
+                $isStrict = false;
+                if (strpos($key, 'strict_') === 0) {
+                    $key = str_replace('strict_', '', $key);
+                    $isStrict = true;
+                }
+
                 if (is_string($key) && isset($filterFields[$key])) {
                     $key = $filterFields[$key];
                 }
 
-                if (is_string($value)) {
+                if (is_string($value) && !$isStrict) {
                     $valueList = explode(',', $value);
                     $value = count($valueList) > 1 ? $valueList : $value;
                 }

@@ -22,6 +22,10 @@ abstract class BaseFilterField
      * @var bool
      */
     protected $isDefault;
+    /**
+     * @var string
+     */
+    protected $prefix = '';
 
     public function __construct(string $id, string $title)
     {
@@ -37,6 +41,16 @@ abstract class BaseFilterField
     public function setOriginalId(string $id)
     {
         $this->originalId = $id;
+    }
+
+    /**
+     * @param bool $mode
+     * @return $this
+     */
+    public function setStrictMode(bool $mode): self
+    {
+        $this->prefix = $mode ? 'strict_' : '';
+        return $this;
     }
 
     /**
