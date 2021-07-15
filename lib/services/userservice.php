@@ -177,12 +177,12 @@ class UserService extends BaseModelService implements UserServiceInterface
     /**
      * @param string $login
      * @param string $password
-     * @return UserContextInterface|null
+     * @return int
      * @throws ArgumentException
      * @throws ObjectPropertyException
      * @throws SystemException
      */
-    public function login(string $login, string $password): ?UserContextInterface
+    public function findUserIdByLoginPassword(string $login, string $password): int
     {
         $userData = UserTable::getRow([
             'filter' => [
@@ -196,14 +196,32 @@ class UserService extends BaseModelService implements UserServiceInterface
         ]);
 
         if (empty($userData)) {
-            return null;
+            return 0;
         }
 
         if (!Password::equals($userData['PASSWORD'], $password)) {
+            return 0;
+        }
+
+        return (int)$userData['ID'];
+    }
+
+    /**
+     * @param string $login
+     * @param string $password
+     * @return UserContextInterface|null
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
+     */
+    public function login(string $login, string $password): ?UserContextInterface
+    {
+        $userId = $this->findUserIdByLoginPassword($login, $password);
+        if (!$userId) {
             return null;
         }
 
-        $user = $this->getById((int)$userData['ID']);
+        $user = $this->getById($userId);
         if (!($user instanceof User)) {
             return null;
         }
