@@ -158,7 +158,7 @@ class UserService extends BaseModelService implements UserServiceInterface
         if ($model->getId() > 0) {
             $isSuccess = (bool)$cUser->Update($model->getId(), $data);
             if (!$isSuccess) {
-                return $result->addError(new Error('Ошибка обновления пользователя'));
+                return $result->addError(new Error("Ошибка обновления пользователя: {$cUser->LAST_ERROR}"));
             }
 
             return $result;
@@ -166,7 +166,7 @@ class UserService extends BaseModelService implements UserServiceInterface
 
         $id = (int)$cUser->Add($data);
         if (!$id) {
-            return $result->addError(new Error('Ошибка добавления пользователя'));
+            return $result->addError(new Error("Ошибка добавления пользователя: {$cUser->LAST_ERROR}"));
         }
 
         $model['ID'] = $id;
