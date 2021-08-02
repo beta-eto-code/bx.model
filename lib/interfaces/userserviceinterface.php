@@ -16,6 +16,13 @@ interface UserServiceInterface extends ModelServiceInterface
     public function login(string $login, string $password): ?UserContextInterface;
 
     /**
+     * @param string $login
+     * @param string $password
+     * @return int
+     */
+    public function findUserIdByLoginPassword(string $login, string $password): int;
+
+    /**
      * @return bool
      */
     public function isAuthorized(): bool;

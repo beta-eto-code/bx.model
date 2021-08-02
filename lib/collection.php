@@ -2,6 +2,7 @@
 
 namespace Bx\Model;
 
+use ArrayIterator;
 use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
 use Bx\Model\Interfaces\GroupCollectionInterface;
@@ -49,12 +50,13 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * @return SplObjectStorage
+     * @return ArrayIterator
      */
     public function getIterator()
     {
-        $this->items->rewind();
-        return $this->items;
+        return new ArrayIterator(iterator_to_array($this->items));
+//        $this->items->rewind();
+//        return $this->items;
     }
 
     /**

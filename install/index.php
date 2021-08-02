@@ -14,19 +14,25 @@ class bx_model extends CModule
 
     public function __construct()
     {
-        $this->MODULE_VERSION = "0.0.1";
+        $this->MODULE_VERSION = "1.0.1";
         $this->MODULE_VERSION_DATE = "2021-01-19 07:30:32";
         $this->MODULE_NAME = "Bitrix model";
         $this->MODULE_DESCRIPTION = "";
     }
 
-    public function DoInstall()
+    /**
+     * @return bool
+     */
+    public function DoInstall(): bool
     {
         ModuleManager::RegisterModule($this->MODULE_ID);
         return true;
     }
 
-    public function DoUninstall()
+    /**
+     * @return bool
+     */
+    public function DoUninstall(): bool
     {
         ModuleManager::UnRegisterModule($this->MODULE_ID);
         return true;

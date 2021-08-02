@@ -27,7 +27,7 @@ class StringFilterField extends BaseFilterField
         $data = $this->getOptionsFilter($options);
         if (!empty($data[$this->id])) {
             return [
-                'like_'.$this->id => $data[$this->id],
+                'like_'.$this->prefix.$this->id => $data[$this->id],
             ];
         }
 

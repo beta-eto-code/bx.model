@@ -52,7 +52,7 @@ class ListFilterField extends BaseFilterField
         $data = $this->getOptionsFilter($options);
         if (!empty($data[$this->id])) {
             return [
-                $this->id => $data[$this->id],
+                $this->prefix.$this->id => $data[$this->id],
             ];
         }
 

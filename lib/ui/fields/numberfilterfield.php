@@ -31,33 +31,33 @@ class NumberFilterField extends BaseFilterField
         switch ($type) {
             case 'range':
                 if (!empty($from)) {
-                    $filter['from_'.$this->id] = $mFrom;
+                    $filter['from_'.$this->prefix.$this->id] = $mFrom;
                 }
 
                 if (!empty($to)) {
-                    $filter['to_'.$this->id] = $mTo;
+                    $filter['to_'.$this->prefix.$this->id] = $mTo;
                 }
 
                 return $filter;
             case 'more':
                 if (!empty($from)) {
-                    $filter['from_'.$this->id] = $mFrom;
+                    $filter['from_'.$this->prefix.$this->id] = $mFrom;
                 }
 
                 return $filter;
             case 'less':
                 if (!empty($to)) {
-                    $filter['to_'.$this->id] = $mTo;
+                    $filter['to_'.$this->prefix.$this->id] = $mTo;
                 }
 
                 return $filter;
             default:
                 if (!empty($from)) {
-                    $filter[$this->id] = $from;
+                    $filter[$this->prefix.$this->id] = $from;
                 }
 
                 if (!empty($to)) {
-                    $filter[$this->id] = $to;
+                    $filter[$this->prefix.$this->id] = $to;
                 }
 
                 return $filter;
