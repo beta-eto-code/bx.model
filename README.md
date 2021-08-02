@@ -714,6 +714,9 @@ $grid = new ModelGrid(
  */
 $grid->addSearchFilterField('name', 'Название');
 $grid->addNumericFilterField('id', 'ID');
+$grid->addBooleanFilterField('active', 'Активность')
+          ->setTrueOption('Активно', 'Y')
+          ->setFalseOption('Не активно', 'N');
 $grid->addStringFilterField('article', 'Артикул');
 $grid->addDateFilterField('date_create', 'Дата создания');
 $grid->addListFilterField('status', 'Статус', [
