@@ -778,6 +778,11 @@ $grid->setGroupAction('Опубликовать', 'accept')
 $grid->addAdminButtonLink('Добавить', '/bitrix/admin/product_detail.php?lang='.LANG, 'btn_new');
 
 /**
+ * Указываем, показывать ли кнопку экспорта в Excel (формирование excel-файла средствами битрикса)
+ */
+$grid->setShowExcelBtn(true);
+
+/**
  * Добавляем ссылку на строку таблицы (переход по двойному клику мышкой)
  * Если не задать второй аргумент title, по умолчанию будет Перейти
  * Если шаблон не подходит, можно использовать setDefaultRowLinkByCallback(callable $fnCalcLink, ?string $linkTitle = null)

@@ -143,6 +143,10 @@ class ModelGrid
      * @var string
      */
     private $defaultRowLinkTitle;
+    /**
+     * @var bool
+     */
+    private $showExcelBtn = false;
 
     public function __construct(ModelServiceInterface $modelService, string $code, string $primaryKey = 'ID')
     {
@@ -404,9 +408,13 @@ class ModelGrid
 
         $this->query = $this->modelService->query($this->userContext ?? null)
             ->loadSort($this->getSort())
-            ->loadFiler($this->getFilterData())
-            ->setLimit($this->nav->getPageSize())
-            ->setPage($this->nav->getCurrentPage());
+            ->loadFiler($this->getFilterData());
+
+        if(!$this->grid->isExportMode()) {
+            $this->query
+                ->setLimit($this->nav->getPageSize())
+                ->setPage($this->nav->getCurrentPage());
+        }
 
         if (!empty($this->defaultFilter)) {
             $this->query->addFilter($this->defaultFilter);
@@ -473,6 +481,13 @@ class ModelGrid
     {
         $this->defaultRowLinkFunction = $fnCalcLink;
         $this->defaultRowLinkTitle = $linkTitle;
+    }
+
+    /**
+     * @param bool $showExcelBtn
+     */
+    public function setShowExcelBtn(bool $showExcelBtn) {
+        $this->showExcelBtn = $showExcelBtn;
     }
 
     /**
@@ -574,7 +589,7 @@ class ModelGrid
             $result[] = $item->toArray();
         }
 
-        $this->grid->AddAdminContextMenu($result);
+        $this->grid->AddAdminContextMenu($result, $this->showExcelBtn);
     }
 
     /**
@@ -661,6 +676,15 @@ class ModelGrid
             $listParams['ACTION_PANEL'] = [];
         }
 
-        $this->grid->DisplayList($listParams);
+        if($this->grid->isExportMode()) {
+            global $APPLICATION;
+            $APPLICATION->RestartBuffer();
+            $this->grid->CheckListMode();
+        }
+        else {
+            $this->grid->DisplayList($listParams);
+        }
+
     }
+
 }
