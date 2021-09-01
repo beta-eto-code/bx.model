@@ -132,10 +132,34 @@ class DateFilterField extends BaseFilterField
                     "to_{$this->prefix}{$this->id}" => $endDate->add("1 days")
                 ];
             case 'LAST_WEEK':
+                $startDate = (clone $currentDay)->add("last week");
+                $endDate = (clone $startDate)->add('7 days');
+                return [
+                    "from_{$this->prefix}{$this->id}" => $startDate,
+                    "to_{$this->prefix}{$this->id}" => $endDate
+                ];
             case 'LAST_MONTH':
+                $startDate = Date::createFromPhp(new \DateTime('first day of last month'));
+                $endDate = Date::createFromPhp(new \DateTime('first day of this month'));
+                return [
+                    "from_{$this->prefix}{$this->id}" => $startDate,
+                    "to_{$this->prefix}{$this->id}" => $endDate
+                ];
             case 'NEXT_WEEK':
+                $startDate = (clone $currentDay)->add('next week');
+                $endDate = (clone $startDate)->add('7 days');
+                return [
+                    "from_{$this->prefix}{$this->id}" => $startDate,
+                    "to_{$this->prefix}{$this->id}" => $endDate
+                ];
             case 'NEXT_MONTH':
-                return [];
+                $startDate = Date::createFromPhp(new \DateTime('first day of next month'));
+                $endDate = Date::createFromPhp(new \DateTime('last day of next month'));
+                $endDate->add('1 day');
+                return [
+                    "from_{$this->prefix}{$this->id}" => $startDate,
+                    "to_{$this->prefix}{$this->id}" => $endDate
+                ];
         }
 
         return [];
