@@ -21,6 +21,7 @@ use Bx\Model\UI\AdminButtonLink;
 use Bx\Model\UI\BaseAdminButton;
 use Bx\Model\UI\BaseGridColumn;
 use Bx\Model\UI\Fields\BaseFilterField;
+use Bx\Model\UI\Fields\BooleanFilterField;
 use Bx\Model\UI\Fields\DateFilterField;
 use Bx\Model\UI\Fields\ListFilterField;
 use Bx\Model\UI\Fields\NumberFilterField;
@@ -50,6 +51,7 @@ use Closure;
  *
  *  $grid->addNumericFilterField('sort', 'Индекс сортировки');
  *  $grid->addStringFilterField('name', 'Название');
+ *  $grid->addBooleanFilterField('active', 'Активность')->setTrueOption('Активно');
  *  $grid->addListFilterField('field', 'Поле с выбором значений', [1 => 'one', 2 => 'two', 3 => 'three']);
  *
  *  $grid->show();
@@ -282,6 +284,20 @@ class ModelGrid
     public function addDateFilterField(string $id, string $title): DateFilterField
     {
         $field = new DateFilterField($id, $title);
+        $this->addFilterField($field);
+
+        return $field;
+    }
+
+    /**
+     * Добавляем фильтр для поля-флага
+     * @param string $id
+     * @param string $title
+     * @return BooleanFilterField
+     */
+    public function addBooleanFilterField(string $id, string $title): BooleanFilterField
+    {
+        $field = new BooleanFilterField($id, $title);
         $this->addFilterField($field);
 
         return $field;
