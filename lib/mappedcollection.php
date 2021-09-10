@@ -4,13 +4,14 @@ namespace Bx\Model;
 
 use ArrayAccess;
 use ArrayIterator;
+use Bx\Model\Interfaces\CollectionInterface;
 use Bx\Model\Interfaces\CollectionItemInterface;
 use Bx\Model\Interfaces\GroupCollectionInterface;
 use Bx\Model\Interfaces\ReadableCollectionInterface;
 use Exception;
 use Iterator;
 
-class MappedCollection implements ReadableCollectionInterface, ArrayAccess
+class MappedCollection implements CollectionInterface, ArrayAccess
 {
     /**
      * @var CollectionItemInterface[]
@@ -32,8 +33,7 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
 
         foreach($collection as $item) {
             if ($item instanceof CollectionItemInterface && $item->hasValueKey($key)) {
-                $indexKey = $item->getValueByKey($key);
-                $this->list[$indexKey] = $item;
+                $this->append($item);
             }
         }
     }
@@ -249,5 +249,27 @@ class MappedCollection implements ReadableCollectionInterface, ArrayAccess
     public function map(callable $fn): array
     {
         return array_map($fn, $this->list);
+    }
+
+    /**
+     * @param CollectionItemInterface $item
+     */
+    public function append(CollectionItemInterface $item)
+    {
+        if ($item instanceof CollectionItemInterface && $item->hasValueKey($this->key)) {
+            $indexKey = $item->getValueByKey($this->key);
+            $this->list[$indexKey] = $item;
+        }
+    }
+
+    /**
+     * @param CollectionItemInterface $item
+     */
+    public function remove(CollectionItemInterface $item)
+    {
+        if ($item instanceof CollectionItemInterface && $item->hasValueKey($this->key)) {
+            $indexKey = $item->getValueByKey($this->key);
+            unset($this->list[$indexKey]);
+        }
     }
 }

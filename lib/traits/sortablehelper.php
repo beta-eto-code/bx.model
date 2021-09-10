@@ -30,7 +30,7 @@ trait SortableHelper
     {
         $sortFields = static::getSortFields();
         $fieldSort = $params['field_sort'] ?? null;
-        $orderSort = strtolower($params['order_sort']) === 'desc' ? 'desc' : 'asc';
+        $orderSort = strtolower($params['order_sort'] ?? '') === 'desc' ? 'desc' : 'asc';
 
         if (!empty($fieldSort) && static::allowForSort($fieldSort)) {
             if (isset($sortFields[$fieldSort])) {

@@ -5,7 +5,6 @@ namespace Bx\Model;
 
 use Bitrix\Main\ORM\Fields\ExpressionField;
 use Bitrix\Main\ORM\Fields\Field;
-use Bx\Model\ModelCollection;
 use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\PaginationInterface;
 use Bx\Model\Interfaces\Models\QueryableModelServiceInterface;

@@ -66,6 +66,10 @@ class Query implements QueryInterface
      */
     public function setLimit(int $limit): QueryInterface
     {
+        if ($limit < 0) {
+            $limit = 0;
+        }
+
         $this->limit = $limit;
         return $this;
     }
@@ -82,10 +86,10 @@ class Query implements QueryInterface
 
     /**
      * Указываем связанные сущности для выборки
-     * @param array $list
+     * @param array|null $list
      * @return QueryInterface
      */
-    public function setFetchList(array $list): QueryInterface
+    public function setFetchList(?array $list): QueryInterface
     {
         $this->fetchList = $list;
         return $this;
@@ -98,6 +102,10 @@ class Query implements QueryInterface
      */
     public function setPage(int $page): QueryInterface
     {
+        if ($page <= 0) {
+            $page = 1;
+        }
+
         $this->page = $page;
         return $this;
     }
@@ -194,6 +202,10 @@ class Query implements QueryInterface
      */
     public function getOffset(): int
     {
+        if ($this->page <= 0) {
+            return 0;
+        }
+
         return $this->limit * ($this->page - 1);
     }
 

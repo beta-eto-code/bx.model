@@ -36,7 +36,9 @@ abstract class AbsOptimizedModel implements ModelInterface
         }
 
         $this->data = $data;
-        $this->reflectEntityObject();
+        if ($data instanceof EntityObject) {
+            $this->reflectEntityObject();
+        }
     }
 
     /**
@@ -92,7 +94,7 @@ abstract class AbsOptimizedModel implements ModelInterface
     {
         $result = $this->toArray();
         foreach ($result as &$value) {
-            if ($value instanceof DateTime) {
+            if ($value instanceof DateTime || $value instanceof \DateTime) {
                 $value = $value->format('c');
                 continue;
             }

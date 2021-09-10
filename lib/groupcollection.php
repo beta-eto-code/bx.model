@@ -4,6 +4,7 @@ namespace Bx\Model;
 
 use Bx\Model\Interfaces\CollectionItemInterface;
 use Bx\Model\Interfaces\GroupCollectionInterface;
+use Bx\Model\Interfaces\ReadableCollectionInterface;
 
 class GroupCollection extends Collection implements GroupCollectionInterface
 {
@@ -67,6 +68,43 @@ class GroupCollection extends Collection implements GroupCollectionInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed ...$value
+     * @return CollectionItemInterface[]|ReadableCollectionInterface
+     */
+    public function filterByKey(string $key, ...$value): ReadableCollectionInterface
+    {
+        $newCollection = new static($this->key, $this->value);
+        if (empty($value)) {
+            return $newCollection;
+        }
+
+        foreach($this as $item) {
+            if ($item->hasValueKey($key) && in_array($item->getValueByKey($key), (array)$value)) {
+                $newCollection->append($item);
+            }
+        }
+
+        return $newCollection;
+    }
+
+    /**
+     * @param callable $fn - attribute CollectionItemInterface
+     * @return ReadableCollectionInterface
+     */
+    public function filter(callable $fn): ReadableCollectionInterface
+    {
+        $newCollection = new static($this->key, $this->value);
+        foreach($this as $item) {
+            if ($fn($item) === true) {
+                $newCollection->append($item);
+            }
+        }
+
+        return $newCollection;
     }
 
     public function jsonSerialize(): array

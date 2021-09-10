@@ -23,8 +23,7 @@ class MappedCollectionCallback extends MappedCollection
 
         foreach($collection as $item) {
             if ($item instanceof CollectionItemInterface) {
-                $indexKey = $fn($item);
-                $this->list[$indexKey] = $item;
+                $this->append($item);
             }
         }
     }
@@ -36,5 +35,27 @@ class MappedCollectionCallback extends MappedCollection
     public function filter(callable $fn): ReadableCollectionInterface
     {
         return new static((array)array_filter($this->list, $fn), $this->fn);
+    }
+
+    /**
+     * @param CollectionItemInterface $item
+     */
+    public function append(CollectionItemInterface $item)
+    {
+        if ($item instanceof CollectionItemInterface) {
+            $indexKey = ($this->fn)($item);
+            $this->list[$indexKey] = $item;
+        }
+    }
+
+    /**
+     * @param CollectionItemInterface $item
+     */
+    public function remove(CollectionItemInterface $item)
+    {
+        if ($item instanceof CollectionItemInterface) {
+            $indexKey = ($this->fn)($item);
+            unset($this->list[$indexKey]);
+        }
     }
 }

@@ -77,10 +77,10 @@ interface QueryInterface
     public function getOffset(): int;
     /**
      * Указываем связанные сущности для выборки
-     * @param array $list
+     * @param array|null $list
      * @return QueryInterface
      */
-    public function setFetchList(array $list): QueryInterface;
+    public function setFetchList(?array $list): QueryInterface;
     /**
      * Связанные сущности для выборки
      * @return array

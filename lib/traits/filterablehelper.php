@@ -53,13 +53,13 @@ trait FilterableHelper
                 $key = str_replace('datetime_', '', $key);
             }
 
-            if ($this->allowForFilter($key)) {
-                $isStrict = false;
-                if (strpos($key, 'strict_') === 0) {
-                    $key = str_replace('strict_', '', $key);
-                    $isStrict = true;
-                }
+            $isStrict = false;
+            if (strpos($key, 'strict_') === 0) {
+                $key = str_replace('strict_', '', $key);
+                $isStrict = true;
+            }
 
+            if ($this->allowForFilter($key)) {
                 if (is_string($key) && isset($filterFields[$key])) {
                     $key = $filterFields[$key];
                 }
