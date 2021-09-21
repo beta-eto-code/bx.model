@@ -1,6 +1,7 @@
 {
     "name": "beta/bx.model",
     "type": "bitrix-module",
+    "description": "",
     "license": "MIT",
     "authors": [
         {
