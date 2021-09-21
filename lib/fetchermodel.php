@@ -284,10 +284,13 @@ class FetcherModel implements FetcherModelInterface
 
             foreach ($linkedCollection as $linkedModel) {
                 $likedValue = $linkedModel[$this->linkedModelKey] ?? null;
-                if (
-                    ($isCallableCallback && ($this->compareCallback)($model, $linkedModel)) ||
-                    (!empty($likedValue) && $originalValue == $likedValue)
-                ) {
+                if ($isCallableCallback) {
+                    if (($this->compareCallback)($model, $linkedModel)) {
+                        $model[$this->keySave] = $hasModifyCallback ?
+                            ($this->modifyCallback)($linkedModel) :
+                            $linkedModel;
+                    }
+                } elseif (!empty($likedValue) && $originalValue == $likedValue) {
                     $model[$this->keySave] = $hasModifyCallback ? ($this->modifyCallback)($linkedModel) : $linkedModel;
                 }
             }

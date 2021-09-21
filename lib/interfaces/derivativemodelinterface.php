@@ -2,8 +2,6 @@
 
 namespace Bx\Model\Interfaces;
 
-use Bx\Model\Interfaces\FetcherModelInterface;
-
 interface DerivativeModelInterface extends ModelInterface
 {
     /**

@@ -22,5 +22,8 @@
         "psr-4": {
             "Bx\\Model\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "phpunit"
     }
 }
