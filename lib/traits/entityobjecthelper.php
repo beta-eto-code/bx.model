@@ -1,6 +1,7 @@
 <?php
 
 namespace Bx\Model\Traits;
+use Bitrix\Main\ORM\Objectify\Collection;
 use Bitrix\Main\ORM\Objectify\EntityObject;
 use Bx\Model\EntityObjectModel;
 use Bx\Model\Interfaces\ModelInterface;
@@ -56,17 +57,37 @@ trait EntityObjectHelper
         static::$customDataProperty->setAccessible(true);
     }
 
+    protected static function getInternalData(EntityObject $object): array
+    {
+        $actualValues = static::$actualValuesProperty->getValue($object) ?? [];
+        $currentValues = static::$currentValuesProperty->getValue($object)?? [];
+        $runtimeValues = static::$runtimeValuesProperty->getValue($object)?? [];
+        $customData = static::$customDataProperty->getValue($object)?? [];
+
+        return array_merge($actualValues, $currentValues, $runtimeValues, $customData);
+    }
+
     /**
      * @return array
      */
     protected function getEntityObjectData(): array
     {
-        $actualValues = static::$actualValuesProperty->getValue($this->data) ?? [];
-        $currentValues = static::$currentValuesProperty->getValue($this->data)?? [];
-        $runtimeValues = static::$runtimeValuesProperty->getValue($this->data)?? [];
-        $customData = static::$customDataProperty->getValue($this->data)?? [];
+        $result = static::getInternalData($this->data);
+        foreach ($result as &$value) {
+          if ($value instanceof Collection) {
+            $list = [];
+            foreach ($value as $item) {
+              $list[] = static::getInternalData($item);
+            }
 
-        return array_merge($actualValues, $currentValues, $runtimeValues, $customData);
+            $value = $list;
+          } elseif($value instanceof EntityObject) {
+            $value = static::getInternalData($value);
+          }
+        }
+        unset($value);
+
+        return $result;
     }
 
     /**
