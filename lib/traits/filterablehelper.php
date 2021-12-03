@@ -33,6 +33,7 @@ trait FilterableHelper
         $result = [];
         $filterFields = static::getFilterFields();
         foreach ($params as $key => $value) {
+            $postfix = '';
             $prefix = '=';
             if (strpos($key, 'from_') === 0) {
                 $prefix = '>=';
@@ -43,6 +44,10 @@ trait FilterableHelper
             } elseif (strpos($key, 'like_') === 0) {
                 $prefix = '%';
                 $key = str_replace('like_', '', $key);
+            } elseif (strpos($key, 'flike_') === 0) {
+                $postfix = '%';
+                $prefix = '';
+                $key = str_replace('flike_', '', $key);
             }
 
             if (strpos($key, 'date_') === 0) {
@@ -69,7 +74,7 @@ trait FilterableHelper
                     $value = count($valueList) > 1 ? $valueList : $value;
                 }
 
-                $result[$prefix.$key] = $value;
+                $result[$prefix.$key.$postfix] = $value;
             }
         }
 
