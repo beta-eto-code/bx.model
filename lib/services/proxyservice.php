@@ -103,7 +103,7 @@ class ProxyService implements ModelServiceInterface
         $result = [];
         $filterFields = $this->filterFields ?? [];
         foreach ($params as $key => $value) {
-            $postfix = '';
+            $postValue= '';
             $prefix = '=';
             if (strpos($key, 'from_') === 0) {
                 $prefix = '>=';
@@ -115,7 +115,7 @@ class ProxyService implements ModelServiceInterface
                 $prefix = '%';
                 $key = str_replace('like_', '', $key);
             } elseif (strpos($key, 'flike_') === 0) {
-                $postfix = '%';
+                $postValue = '%';
                 $prefix = '';
                 $key = str_replace('flike_', '', $key);
             }
@@ -145,7 +145,7 @@ class ProxyService implements ModelServiceInterface
                     $value = count($valueList) > 1 ? $valueList : $value;
                 }
 
-                $result[$prefix.$key.$postfix] = $value;
+                $result[$prefix.$key] = $value.$postValue;
             }
         }
 
