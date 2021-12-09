@@ -145,7 +145,7 @@ class ProxyService implements ModelServiceInterface
                     $value = count($valueList) > 1 ? $valueList : $value;
                 }
 
-                $result[$prefix.$key] = $value.$postValue;
+                $result[$prefix.$key] = is_array($value) ? $value : $value.$postValue;
             }
         }
 
