@@ -74,7 +74,11 @@ trait FilterableHelper
                     $value = count($valueList) > 1 ? $valueList : $value;
                 }
 
-                $result[$prefix.$key] = is_array($value) ? $value : $value.$postValue;
+                $result[$prefix.$key] = !is_array($value) ?
+                    $value.$postValue :
+                    array_map(function($v) use ($postValue) {
+                        return $v.$postValue;
+                    }, $value);
             }
         }
 
