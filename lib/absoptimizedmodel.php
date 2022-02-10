@@ -187,4 +187,13 @@ abstract class AbsOptimizedModel implements ModelInterface
     {
         return new ArrayIterator($this->getData());
     }
+
+    /**
+     * @param callable $fnMap - function($item): array
+     * @return mixed
+     */
+    public function map(callable $fnMap)
+    {
+        return $fnMap($this);
+    }
 }

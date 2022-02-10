@@ -8,7 +8,7 @@ use IteratorAggregate;
 use Countable;
 use JsonSerializable;
 
-interface ReadableCollectionInterface extends IteratorAggregate, Countable, JsonSerializable
+interface ReadableCollectionInterface extends IteratorAggregate, Countable, JsonSerializable, MappableInterface
 {
     /**
      * @param string $key
@@ -60,10 +60,4 @@ interface ReadableCollectionInterface extends IteratorAggregate, Countable, Json
      * @return CollectionItemInterface|null
      */
     public function first(): ?CollectionItemInterface;
-
-    /**
-     * @param callable $fn
-     * @return array
-     */
-    public function map(callable $fn): array;
 }

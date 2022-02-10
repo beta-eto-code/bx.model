@@ -37,6 +37,15 @@ class ModelCollection extends Collection implements ModelCollectionInterface
     }
 
     /**
+     * @param $list
+     * @return ReadableCollectionInterface
+     */
+    protected function newCollection($list): ReadableCollectionInterface
+    {
+        return new static($list, $this->className);
+    }
+
+    /**
      * @param CollectionItemInterface $item
      * @return void
      */
@@ -97,27 +106,6 @@ class ModelCollection extends Collection implements ModelCollectionInterface
     }
 
     /**
-     * @param string $key
-     * @param mixed ...$value
-     * @return ModelInterface[]|ModelCollection
-     */
-    public function filterByKey(string $key, ...$value): ReadableCollectionInterface
-    {
-        $newCollection = new static([], $this->className);
-        if (empty($value)) {
-            return $newCollection;
-        }
-
-        foreach($this as $item) {
-            if ($item->hasValueKey($key) && in_array($item->getValueByKey($key), (array)$value)) {
-                $newCollection->append($item);
-            }
-        }
-
-        return $newCollection;
-    }
-
-    /**
      * @deprecated
      * @param string $fieldName
      * @param $value
@@ -126,15 +114,6 @@ class ModelCollection extends Collection implements ModelCollectionInterface
     public function filerByColumn(string $fieldName, $value): self
     {
         return $this->filterByKey($fieldName, $value);
-    }
-
-    /**
-     * @param callable $fn
-     * @return ReadableCollectionInterface
-     */
-    public function filter(callable $fn): ReadableCollectionInterface
-    {
-        return new static(array_filter(iterator_to_array($this->items), $fn), $this->className);
     }
 
     /**

@@ -25,6 +25,15 @@ class Collection implements CollectionInterface
     }
 
     /**
+     * @param $list
+     * @return ReadableCollectionInterface
+     */
+    protected function newCollection($list): ReadableCollectionInterface
+    {
+        return new static(...$list);
+    }
+
+    /**
      * @param string $key
      * @param mixed $value
      * @return CollectionItemInterface|null
@@ -55,8 +64,6 @@ class Collection implements CollectionInterface
     public function getIterator()
     {
         return new ArrayIterator(iterator_to_array($this->items));
-//        $this->items->rewind();
-//        return $this->items;
     }
 
     /**
@@ -125,7 +132,7 @@ class Collection implements CollectionInterface
      */
     public function filterByKey(string $key, ...$value): ReadableCollectionInterface
     {
-        $newCollection = new static;
+        $newCollection = $this->newCollection([]);
         if (empty($value)) {
             return $newCollection;
         }
@@ -145,7 +152,7 @@ class Collection implements CollectionInterface
      */
     public function filter(callable $fn): ReadableCollectionInterface
     {
-        $newCollection = new static;
+        $newCollection = $this->newCollection([]);
         foreach($this as $item) {
             if ($fn($item) === true) {
                 $newCollection->append($item);
