@@ -40,7 +40,7 @@ class GroupCollection extends Collection implements GroupCollectionInterface
      */
     public function getValue()
     {
-        return $this->key;
+        return $this->value;
     }
 
     /**

@@ -33,12 +33,13 @@ interface ReadableModelServiceInterface
      * @return AbsOptimizedModel|null
      */
     public function getById(int $id, UserContextInterface $userContext = null): ?AbsOptimizedModel;
+
     /**
      * Получаем коллекцию производных моделей
-     * @param DerivativeModelInterface $class
-     * @param array $filter
-     * @param array $sort
-     * @param int $limit
+     * @param string $class
+     * @param array|null $filter
+     * @param array|null $sort
+     * @param int|null $limit
      * @return DerivativeModelInterface[]|ModelCollectionInterface
      */
     public function getModelCollection(string $class, array $filter = null, array $sort = null, int $limit = null): ModelCollectionInterface;
