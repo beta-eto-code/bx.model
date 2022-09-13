@@ -22,9 +22,9 @@ abstract class BaseModelService implements ModelServiceInterface
     use LimiterHelper;
 
     /**
-     * @var Closure
+     * @var ?Closure
      */
-    protected $validateFn;
+    protected $validateFn = null;
 
     /**
      * @inheritDoc
