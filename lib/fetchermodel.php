@@ -1,10 +1,9 @@
 <?php
 
-
 namespace Bx\Model;
 
 use Bx\Model\Interfaces\FetcherModelInterface;
-use Bx\Model\Interfaces\ModelServiceInterface;
+use Bx\Model\Interfaces\Models\ReadableModelServiceInterface;
 use Bx\Model\Interfaces\AggregateModelInterface;
 use Bx\Model\Interfaces\DerivativeModelInterface;
 use Bx\Model\Interfaces\QueryInterface;
@@ -13,7 +12,7 @@ use Exception;
 class FetcherModel implements FetcherModelInterface
 {
     /**
-     * @var ModelServiceInterface
+     * @var ReadableModelServiceInterface
      */
     private $service;
     /**
@@ -59,7 +58,7 @@ class FetcherModel implements FetcherModelInterface
 
     /**
      * FetcherModel constructor.
-     * @param ModelServiceInterface $linkedService
+     * @param ReadableModelServiceInterface $linkedService
      * @param string $keySave
      * @param string $foreignKey
      * @param string $destKey
@@ -67,25 +66,26 @@ class FetcherModel implements FetcherModelInterface
      * @param QueryInterface|null $query
      */
     public function __construct(
-        ModelServiceInterface $linkedService,
+        ReadableModelServiceInterface $linkedService,
         string $keySave,
         string $foreignKey,
         string $destKey,
         bool $isMultipleValue = false,
         QueryInterface $query = null
-    )
-    {
+    ) {
         $this->classCast = null;
         $this->service = $linkedService;
         $this->keySave = $keySave;
         $this->foreignKey = $foreignKey;
         $this->linkedModelKey = $this->destKey = $destKey;
         $this->isMultipleValue = $isMultipleValue;
-        $this->query = $query;
+        if ($query instanceof QueryInterface) {
+            $this->query = $query;
+        }
     }
 
     /**
-     * @param ModelServiceInterface $linkedService
+     * @param ReadableModelServiceInterface $linkedService
      * @param string $keySave
      * @param string $foreignKey
      * @param string $destKey
@@ -93,18 +93,17 @@ class FetcherModel implements FetcherModelInterface
      * @return static
      */
     public static function initAsSingleValue(
-        ModelServiceInterface $linkedService,
+        ReadableModelServiceInterface $linkedService,
         string $keySave,
         string $foreignKey,
         string $destKey,
         QueryInterface $query = null
-    ): self
-    {
+    ): self {
         return new static($linkedService, $keySave, $foreignKey, $destKey, false, $query);
     }
 
     /**
-     * @param ModelServiceInterface $linkedService
+     * @param ReadableModelServiceInterface $linkedService
      * @param string $keySave
      * @param string $foreignKey
      * @param string $destKey
@@ -112,13 +111,12 @@ class FetcherModel implements FetcherModelInterface
      * @return static
      */
     public static function initAsMultipleValue(
-        ModelServiceInterface $linkedService,
+        ReadableModelServiceInterface $linkedService,
         string $keySave,
         string $foreignKey,
         string $destKey,
         QueryInterface $query = null
-    ): self
-    {
+    ): self {
         return new static($linkedService, $keySave, $foreignKey, $destKey, true, $query);
     }
 
@@ -135,6 +133,7 @@ class FetcherModel implements FetcherModelInterface
     /**
      * @param DerivativeModelInterface|string $derivativeModelClass
      * @return FetcherModelInterface
+     * @psalm-suppress MismatchingDocblockParamType
      */
     public function loadAs(string $derivativeModelClass): FetcherModelInterface
     {
@@ -145,6 +144,7 @@ class FetcherModel implements FetcherModelInterface
     /**
      * @param array $listKeyValues
      * @return ModelCollection
+     * @psalm-suppress InvalidReturnType
      */
     private function getLinkedCollection(array $listKeyValues): ModelCollection
     {
@@ -156,7 +156,7 @@ class FetcherModel implements FetcherModelInterface
             if ($this->query->hasSelect()) {
                 $params['select'] = $this->query->getSelect();
             }
-            
+
             if ($this->query->hasLimit()) {
                 $params['limit'] = $this->query->getLimit();
             }
@@ -171,10 +171,13 @@ class FetcherModel implements FetcherModelInterface
         }
 
         if (!empty($this->loadAsClass)) {
+            /**
+             * @psalm-suppress InvalidReturnStatement,PossiblyInvalidArgument
+             */
             return $this->service->getModelCollection(
-                $this->loadAsClass, 
-                $params['filter'] ?? null, 
-                $params['order'] ?? null, 
+                $this->loadAsClass,
+                $params['filter'] ?? null,
+                $params['order'] ?? null,
                 $params['limit'] ?? null
             );
         }
@@ -188,7 +191,7 @@ class FetcherModel implements FetcherModelInterface
     private function fillAsMultipleValue(ModelCollection $collection)
     {
         $listKeyValues = [];
-        foreach($collection->column($this->foreignKey) as $value) {
+        foreach ($collection->column($this->foreignKey) as $value) {
             $listKeyValues = array_merge($listKeyValues, (array)$value);
         }
 
@@ -209,6 +212,9 @@ class FetcherModel implements FetcherModelInterface
             $resultList = [];
             foreach ($linkedCollection as $linkedModel) {
                 $likedValue = $linkedModel[$this->linkedModelKey] ?? null;
+                /**
+                 * @psalm-suppress RedundantCondition
+                 */
                 if (
                     ($isCallableCallback && ($this->compareCallback)($model, $linkedModel)) ||
                     (!empty($likedValue) && is_array($originalValue) && in_array($likedValue, $originalValue))
@@ -226,7 +232,9 @@ class FetcherModel implements FetcherModelInterface
                     $resultCollection = ($this->modifyCallback)($resultCollection);
                 }
 
-                $model[$this->keySave] = !empty($this->classCast) ? $this->classCast::init($resultCollection) : $resultCollection;
+                $model[$this->keySave] = !empty($this->classCast) ?
+                    $this->classCast::init($resultCollection) :
+                    $resultCollection;
             }
         }
     }
@@ -235,10 +243,17 @@ class FetcherModel implements FetcherModelInterface
      * @param AggregateModelInterface|string $aggregateModelClass
      * @return FetcherModelInterface
      * @throws Exception
+     * @psalm-suppress MismatchingDocblockParamType
      */
     public function castTo(string $aggregateModelClass): FetcherModelInterface
     {
+        /**
+         * @psalm-suppress PossiblyInvalidArgument
+         */
         if (!class_exists($aggregateModelClass)) {
+            /**
+             * @psalm-suppress PossiblyInvalidCast
+             */
             throw new Exception("{$aggregateModelClass} is not found!");
         }
 
