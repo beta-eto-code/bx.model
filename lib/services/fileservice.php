@@ -28,7 +28,7 @@ class FileService extends BaseModelService implements FileServiceInterface
     use SortableHelper;
     use LimiterHelper;
 
-    static protected function getFilterFields(): array
+    protected static function getFilterFields(): array
     {
         return [
             'name' => 'ORIGINAL_NAME',
@@ -40,7 +40,7 @@ class FileService extends BaseModelService implements FileServiceInterface
         ];
     }
 
-    static protected function getSortFields(): array
+    protected static function getSortFields(): array
     {
         return [
             'name' => 'ORIGINAL_NAME',
@@ -60,7 +60,7 @@ class FileService extends BaseModelService implements FileServiceInterface
      */
     public function resizeImageCollection(ModelCollection $collection, int $width, int $height, ?int $mode = null)
     {
-        foreach($collection as $image) {
+        foreach ($collection as $image) {
             if ($image instanceof File) {
                 $this->resizeImage($image, $width, $height, $mode);
             }
@@ -204,6 +204,59 @@ class FileService extends BaseModelService implements FileServiceInterface
                 '=ID' => $fileIdList,
             ],
         ]);
+    }
+
+    /**
+     * @param int $fileId
+     * @param string $baseDir
+     * @param string $filePath
+     * @param string|null $name
+     * @param string|null $description
+     * @return File|null
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
+     */
+    public function replaceFile(
+        int $fileId,
+        string $baseDir,
+        string $filePath,
+        ?string $name = null,
+        ?string $description = null
+    ): ?File {
+        if ($fileId > 0) {
+            CFile::Delete($fileId);
+        }
+
+        return $this->saveFile($baseDir, $filePath, $name, $description);
+    }
+
+    /**
+     * @param string $baseDir
+     * @param string $filePath
+     * @param string|null $name
+     * @param string|null $description
+     * @return File|null
+     * @throws ArgumentException
+     * @throws ObjectPropertyException
+     * @throws SystemException
+     */
+    public function saveFile(
+        string $baseDir,
+        string $filePath,
+        ?string $name = null,
+        ?string $description = null
+    ): ?File {
+        $fileData = CFile::MakeFileArray($filePath);
+        if (!empty($name)) {
+            $fileData['name'] = $name;
+        }
+
+        if (!empty($description)) {
+            $fileData['description'] = $description;
+        }
+
+        return $this->internalSaveFiles($baseDir, $fileData)->first();
     }
 
     /**
