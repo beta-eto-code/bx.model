@@ -67,6 +67,73 @@ class Collection implements CollectionInterface
     }
 
     /**
+     * @param string $key
+     * @return CollectionInterface
+     */
+    public function sortByAscending(string $key): ReadableCollectionInterface
+    {
+        $itemList = iterator_to_array($this->items);
+        usort($itemList, function (
+            CollectionItemInterface $itemA,
+            CollectionItemInterface $itemB
+        ) use ($key): int {
+            $valueA = $itemA->getValueByKey($key);
+            $valueB = $itemB->getValueByKey($key);
+            return $this->cmp($valueA, $valueB);
+        });
+        return $this->newCollection($itemList);
+    }
+
+    /**
+     * @param string $key
+     * @return CollectionInterface
+     */
+    public function sortByDescending(string $key): ReadableCollectionInterface
+    {
+        $itemList = iterator_to_array($this->items);
+        usort($itemList, function (
+            CollectionItemInterface $itemA,
+            CollectionItemInterface $itemB
+        ) use ($key): int {
+            $valueA = $itemA->getValueByKey($key);
+            $valueB = $itemB->getValueByKey($key);
+            return $this->cmp($valueA, $valueB) * -1;
+        });
+        return $this->newCollection($itemList);
+    }
+
+    public function cmp($valueA, $valueB): int
+    {
+        $valueA = $this->getNormalizedValueForCompare($valueA);
+        $valueB = $this->getNormalizedValueForCompare($valueB);
+        if (is_numeric($valueA) && is_numeric($valueB)) {
+            return (int) ceil($valueA - $valueB);
+        }
+
+        $valueA = (string) $valueA;
+        $valueB = (string) $valueB;
+        return strcmp($valueA, $valueB);
+    }
+
+    /**
+     * @param $value
+     * @return mixed
+     */
+    private function getNormalizedValueForCompare($value)
+    {
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return $value->__toString();
+        }
+
+        return $value;
+    }
+
+    private function isUnComparable($value): bool
+    {
+        return is_array($value) || is_object($value);
+    }
+
+    /**
      * @param callable $fn - attribute CollectionItemInterface
      * @return CollectionItemInterface|null
      */
