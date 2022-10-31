@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Bx\Model;
-
 
 use Bx\Model\Interfaces\AccessStrategyInterface;
 use Bx\Model\Interfaces\UserContextInterface;
@@ -34,10 +32,10 @@ class UserContext implements UserContextInterface
         return $this->user->getId();
     }
 
-    public function hasAccessOperation(int $operationId): bool
+    public function hasAccessOperation(int $operationId, string $scope = ''): bool
     {
         if ($this->accessStrategy instanceof AccessStrategyInterface) {
-            return $this->accessStrategy->checkAccess($this->getUser(), $operationId);
+            return $this->accessStrategy->checkAccess($this->getUser(), $operationId, $scope);
         }
 
         return true;

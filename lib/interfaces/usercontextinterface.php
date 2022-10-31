@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Bx\Model\Interfaces;
-
 
 use Bx\Model\Models\User;
 
@@ -20,9 +18,10 @@ interface UserContextInterface
 
     /**
      * @param int $operationId
+     * @param string $scope
      * @return bool
      */
-    public function hasAccessOperation(int $operationId): bool;
+    public function hasAccessOperation(int $operationId, string $scope = ''): bool;
 
     /**
      * @param AccessStrategyInterface $accessStrategy
