@@ -35,7 +35,7 @@ class QueryModel extends Query implements ModelQueryInterface
      * @param array $params
      * @return ModelQueryInterface
      */
-    public function loadFiler(array $params): ModelQueryInterface
+    public function loadFilter(array $params): ModelQueryInterface
     {
         $this->filter = $this->modelService->getFilter($params);
         return $this;

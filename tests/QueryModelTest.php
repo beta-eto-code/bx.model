@@ -93,17 +93,17 @@ class QueryModelTest extends QueryTest
         $this->assertEquals($result, $this->query->getListPaginationData());
     }
 
-    public function testLoadFiler()
+    public function testLoadFilter()
     {
         $this->modelService::$allowedFilterFields = ['id', 'name'];
 
-        $this->query->loadFiler(['from_id' => 3, 'like_name' => 'test', 'other_key' => 'test']);
+        $this->query->loadFilter(['from_id' => 3, 'like_name' => 'test', 'other_key' => 'test']);
         $this->assertEquals([
             '>=id' => 3,
             '%name' => 'test',
         ], $this->query->getFilter());
 
-        $this->query->loadFiler(['to_id' => 3, 'name' => 'test1,test2,test3', 'other_key' => 'test']);
+        $this->query->loadFilter(['to_id' => 3, 'name' => 'test1,test2,test3', 'other_key' => 'test']);
         $this->assertEquals([
             '<=id' => 3,
             '=name' => [
@@ -113,7 +113,7 @@ class QueryModelTest extends QueryTest
             ],
         ], $this->query->getFilter());
 
-        $this->query->loadFiler(['id' => 3, 'strict_name' => 'test1,test2,test3', 'other_key' => 'test']);
+        $this->query->loadFilter(['id' => 3, 'strict_name' => 'test1,test2,test3', 'other_key' => 'test']);
         $this->assertEquals([
             '=id' => 3,
             '=name' => 'test1,test2,test3',

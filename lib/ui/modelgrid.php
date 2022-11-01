@@ -283,7 +283,7 @@ class ModelGrid
         ] = $this->gridOptions->getCurrentOptions();
         $this->modelService->setSortFields($this->sortList ?? []);
         return $this->modelService->query()
-            ->loadFiler($this->filter->getFilter())
+            ->loadFilter($this->filter->getFilter())
             ->loadSort([
                 'field_sort' => $sortField,
                 'order_sort' => $sortOrder,

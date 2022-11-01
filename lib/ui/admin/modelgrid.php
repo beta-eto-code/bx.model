@@ -424,7 +424,7 @@ class ModelGrid
 
         $this->query = $this->modelService->query($this->userContext ?? null)
             ->loadSort($this->getSort())
-            ->loadFiler($this->getFilterData());
+            ->loadFilter($this->getFilterData());
 
         if(!$this->grid->isExportMode()) {
             $this->query
