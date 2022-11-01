@@ -68,7 +68,7 @@ class Pagination implements PaginationInterface
         }
 
         if ($page === $countPages) {
-            return $totalCount % $limit;
+            return $totalCount - $limit * ($countPages-1);
         }
 
         return $totalCount > $limit ? $limit : $totalCount;
