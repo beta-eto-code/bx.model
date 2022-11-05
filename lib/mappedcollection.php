@@ -31,11 +31,20 @@ class MappedCollection implements CollectionInterface, ArrayAccess
         $this->list = [];
         $this->key = $key;
 
-        foreach($collection as $item) {
+        foreach ($collection as $item) {
             if ($item instanceof CollectionItemInterface && $item->hasValueKey($key)) {
                 $this->append($item);
             }
         }
+    }
+
+    /**
+     * @param CollectionItemInterface[] $list
+     * @return ReadableCollectionInterface
+     */
+    public function newCollection($list): ReadableCollectionInterface
+    {
+        return new static($list, ...$list);
     }
 
     /**
@@ -45,7 +54,7 @@ class MappedCollection implements CollectionInterface, ArrayAccess
      */
     public function findByKey(string $key, $value): ?CollectionItemInterface
     {
-        foreach($this->list as $item) {
+        foreach ($this->list as $item) {
             if ($item->hasValueKey($key) && $item->assertValueByKey($key, $value)) {
                 return $item;
             }
@@ -60,7 +69,7 @@ class MappedCollection implements CollectionInterface, ArrayAccess
      */
     public function find(callable $fn): ?CollectionItemInterface
     {
-        foreach($this->list as $item) {
+        foreach ($this->list as $item) {
             if ($fn($item) === true) {
                 return $item;
             }
@@ -76,13 +85,13 @@ class MappedCollection implements CollectionInterface, ArrayAccess
     public function groupByKey(string $key): ReadableCollectionInterface
     {
         $list = [];
-        foreach($this->list as $item) {
+        foreach ($this->list as $item) {
             $index = $item->getValueByKey($key);
             $list[$index][] = $item;
         }
 
         $collection = new Collection();
-        foreach($list as $index => $itemsList) {
+        foreach ($list as $index => $itemsList) {
             $group = new GroupCollection($key, $index, ...$itemsList);
             $collection->append($group);
         }
@@ -97,13 +106,13 @@ class MappedCollection implements CollectionInterface, ArrayAccess
     public function group(string $key, callable $fnCalcKeyValue): ReadableCollectionInterface
     {
         $list = [];
-        foreach($this->list as $item) {
+        foreach ($this->list as $item) {
             $index = $fnCalcKeyValue($item);
             $list[$index][] = $item;
         }
 
         $collection = new Collection();
-        foreach($list as $index => $itemsList) {
+        foreach ($list as $index => $itemsList) {
             $group = new GroupCollection($key, $index, ...$itemsList);
             $collection->append($group);
         }
@@ -121,7 +130,7 @@ class MappedCollection implements CollectionInterface, ArrayAccess
     {
         $result = [];
         $isCallable = $fnModifier !== null;
-        foreach($this->list as $item) {
+        foreach ($this->list as $item) {
             $itemKey = null;
             if (!empty($indexKey) && $item->hasValueKey($indexKey)) {
                 $itemKey = $item->getValueByKey($indexKey);
@@ -147,7 +156,7 @@ class MappedCollection implements CollectionInterface, ArrayAccess
     {
         $result = [];
         $isCallable = $fnModifier !== null;
-        foreach($this->list as $item) {
+        foreach ($this->list as $item) {
             $value = $item->hasValueKey($key) ? $item->getValueByKey($key) : null;
             $result[$value] = $isCallable ? $fnModifier($value) : $value;
         }
@@ -162,7 +171,7 @@ class MappedCollection implements CollectionInterface, ArrayAccess
      */
     public function filterByKey(string $key, ...$value): ReadableCollectionInterface
     {
-        return $this->filter(function(CollectionItemInterface $item) use ($key, $value) {
+        return $this->filter(function (CollectionItemInterface $item) use ($key, $value) {
             return $item->hasValueKey($key) && in_array($item->getValueByKey($key), (array)$value);
         });
     }
@@ -173,7 +182,7 @@ class MappedCollection implements CollectionInterface, ArrayAccess
      */
     public function filter(callable $fn): ReadableCollectionInterface
     {
-        return new static((array)array_filter($this->list, $fn), $this->key);
+        return new static(array_filter($this->list, $fn), $this->key);
     }
 
     /**
@@ -204,7 +213,7 @@ class MappedCollection implements CollectionInterface, ArrayAccess
     public function jsonSerialize(): array
     {
         $result = [];
-        foreach($this->list as $item) {
+        foreach ($this->list as $item) {
             $result[] = $item->jsonSerialize();
         }
 
@@ -246,9 +255,9 @@ class MappedCollection implements CollectionInterface, ArrayAccess
         }
     }
 
-    public function map(callable $fn): array
+    public function map(callable $fnMap): array
     {
-        return array_map($fn, $this->list);
+        return array_map($fnMap, $this->list);
     }
 
     /**

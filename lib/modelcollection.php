@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Bx\Model;
 
 use Bx\Model\Interfaces\CollectionInterface;
@@ -30,17 +29,17 @@ class ModelCollection extends Collection implements ModelCollectionInterface
         foreach ($list as $item) {
             if ($item instanceof $className) {
                 $this->items->attach($item);
-            } elseif(is_array($item) || $item instanceof Traversable) {
+            } elseif (is_array($item) || $item instanceof Traversable) {
                 $this->items->attach(new $className($item));
             }
         }
     }
 
     /**
-     * @param $list
-     * @return ReadableCollectionInterface
+     * @param iterable $list
+     * @return ModelCollection
      */
-    protected function newCollection($list): ReadableCollectionInterface
+    public function newCollection($list): ReadableCollectionInterface
     {
         return new static($list, $this->className);
     }
@@ -80,7 +79,7 @@ class ModelCollection extends Collection implements ModelCollectionInterface
     {
         $result = new ModelCollection([], $className);
         $list = $this->column($key);
-        foreach($list as $item) {
+        foreach ($list as $item) {
             $this->addItemInCollection($result, $item);
         }
 
@@ -99,7 +98,7 @@ class ModelCollection extends Collection implements ModelCollectionInterface
         } elseif (is_array($item)) {
             $collection->add($item);
         } elseif ($item instanceof CollectionInterface) {
-            foreach($item as $subItem) {
+            foreach ($item as $subItem) {
                 $this->addItemInCollection($collection, $subItem);
             }
         }
@@ -144,7 +143,7 @@ class ModelCollection extends Collection implements ModelCollectionInterface
     public function getApiModel(): array
     {
         $result = [];
-        foreach($this as $item) {
+        foreach ($this as $item) {
             $result[] = $item->jsonSerialize();
         }
 

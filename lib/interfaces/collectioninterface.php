@@ -14,4 +14,10 @@ interface CollectionInterface extends ReadableCollectionInterface
      * @return void
      */
     public function remove(CollectionItemInterface $item);
+
+    /**
+     * @param iterable $list
+     * @return ReadableCollectionInterface
+     */
+    public function newCollection($list): ReadableCollectionInterface;
 }

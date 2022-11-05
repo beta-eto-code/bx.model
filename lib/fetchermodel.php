@@ -3,6 +3,7 @@
 namespace Bx\Model;
 
 use Bx\Model\Interfaces\FetcherModelInterface;
+use Bx\Model\Interfaces\ModelCollectionInterface;
 use Bx\Model\Interfaces\Models\ReadableModelServiceInterface;
 use Bx\Model\Interfaces\AggregateModelInterface;
 use Bx\Model\Interfaces\DerivativeModelInterface;
@@ -57,6 +58,11 @@ class FetcherModel implements FetcherModelInterface
     private $modifyCallback;
 
     /**
+     * @var array
+     */
+    private $prefixFieldsForReplace;
+
+    /**
      * FetcherModel constructor.
      * @param ReadableModelServiceInterface $linkedService
      * @param string $keySave
@@ -79,6 +85,7 @@ class FetcherModel implements FetcherModelInterface
         $this->foreignKey = $foreignKey;
         $this->linkedModelKey = $this->destKey = $destKey;
         $this->isMultipleValue = $isMultipleValue;
+        $this->prefixFieldsForReplace = [];
         if ($query instanceof QueryInterface) {
             $this->query = $query;
         }
@@ -174,15 +181,59 @@ class FetcherModel implements FetcherModelInterface
             /**
              * @psalm-suppress InvalidReturnStatement,PossiblyInvalidArgument
              */
-            return $this->service->getModelCollection(
+            $collection = $this->service->getModelCollection(
                 $this->loadAsClass,
                 $params['filter'] ?? null,
                 $params['order'] ?? null,
                 $params['limit'] ?? null
             );
+
+            /**
+             * @psalm-suppress InvalidArgument
+             */
+            return $this->replacePrefixAndGetCollection($collection);
         }
 
-        return $this->service->getList($params);
+        $collection = $this->service->getList($params);
+        return $this->replacePrefixAndGetCollection($collection);
+    }
+
+    public function addPrefixFieldsForRemove(string $prefix): void
+    {
+        $this->prefixFieldsForReplace[$prefix] = '';
+    }
+
+    /**
+     * @param ModelCollection $collection
+     * @return ModelCollection
+     * @psalm-suppress InvalidReturnType
+     */
+    private function replacePrefixAndGetCollection(ModelCollectionInterface $collection): ModelCollection
+    {
+        if (empty($this->prefixFieldsForReplace)) {
+            return $collection;
+        }
+
+        $newDataList = [];
+        foreach ($collection as $key => $item) {
+            $itemData = $this->replacePrefixFromCollectionItemData(iterator_to_array($item));
+            $newDataList[$key] = $itemData;
+        }
+
+        return $collection->newCollection($newDataList);
+    }
+
+    private function replacePrefixFromCollectionItemData(array $itemData): array
+    {
+        $result = [];
+        $keyListForReplace = array_keys($this->prefixFieldsForReplace);
+        $newKeyList = array_values($this->prefixFieldsForReplace);
+        foreach ($itemData as $itemKey => $itemValue) {
+            $itemKey = str_replace($keyListForReplace, $newKeyList, $itemKey);
+            $result[$itemKey] = $itemValue;
+        }
+
+        return $result;
     }
 
     /**

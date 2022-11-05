@@ -19,10 +19,10 @@ class GroupCollection extends Collection implements GroupCollectionInterface
     }
 
     /**
-     * @param $list
+     * @param CollectionItemInterface[] $list
      * @return ReadableCollectionInterface
      */
-    protected function newCollection($list): ReadableCollectionInterface
+    public function newCollection($list): ReadableCollectionInterface
     {
         return new static($this->key, $this->value, ...$list);
     }

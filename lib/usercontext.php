@@ -8,18 +8,14 @@ use Bx\Model\Models\User;
 
 class UserContext implements UserContextInterface
 {
-    /**
-     * @var User
-     */
-    private $user;
-    /**
-     * @var AccessStrategyInterface
-     */
-    private $accessStrategy;
+    private User $user;
+    private ?AccessStrategyInterface $accessStrategy;
+    private array $params;
 
-    public function __construct(User $user)
+    public function __construct(User $user, array $params = [])
     {
         $this->user = $user;
+        $this->params = $params;
     }
 
     public function getUser(): User
@@ -44,5 +40,15 @@ class UserContext implements UserContextInterface
     public function setAccessStrategy(AccessStrategyInterface $accessStrategy)
     {
         $this->accessStrategy = $accessStrategy;
+    }
+
+    public function getParam(string $key)
+    {
+        return $this->params[$key] ?? null;
+    }
+
+    public function setParam(string $key, $value): void
+    {
+        $this->params[$key] = $value;
     }
 }

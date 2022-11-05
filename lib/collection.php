@@ -19,16 +19,16 @@ class Collection implements CollectionInterface
     public function __construct(CollectionItemInterface ...$itemList)
     {
         $this->items = new SplObjectStorage();
-        foreach($itemList as $item) {
+        foreach ($itemList as $item) {
             $this->append($item);
         }
     }
 
     /**
-     * @param $list
+     * @param CollectionItemInterface[] $list
      * @return ReadableCollectionInterface
      */
-    protected function newCollection($list): ReadableCollectionInterface
+    public function newCollection($list): ReadableCollectionInterface
     {
         return new static(...$list);
     }
@@ -40,7 +40,7 @@ class Collection implements CollectionInterface
      */
     public function findByKey(string $key, $value): ?CollectionItemInterface
     {
-        foreach($this as $item) {
+        foreach ($this as $item) {
             if ($item->hasValueKey($key) && $item->assertValueByKey($key, $value)) {
                 return $item;
             }
@@ -139,7 +139,7 @@ class Collection implements CollectionInterface
      */
     public function find(callable $fn): ?CollectionItemInterface
     {
-        foreach($this as $item) {
+        foreach ($this as $item) {
             if ($fn($item) === true) {
                 return $item;
             }
@@ -158,7 +158,7 @@ class Collection implements CollectionInterface
     {
         $result = [];
         $isCallable = $fnModifier !== null;
-        foreach($this as $item) {
+        foreach ($this as $item) {
             $itemKey = null;
             if (!empty($indexKey) && $item->hasValueKey($indexKey)) {
                 $itemKey = $item->getValueByKey($indexKey);
@@ -184,7 +184,7 @@ class Collection implements CollectionInterface
     {
         $result = [];
         $isCallable = $fnModifier !== null;
-        foreach($this as $item) {
+        foreach ($this as $item) {
             $value = $item->hasValueKey($key) ? $item->getValueByKey($key) : null;
             $result[$value] = $isCallable ? $fnModifier($value) : $value;
         }
@@ -204,7 +204,7 @@ class Collection implements CollectionInterface
             return $newCollection;
         }
 
-        foreach($this as $item) {
+        foreach ($this as $item) {
             if ($item->hasValueKey($key) && in_array($item->getValueByKey($key), (array)$value)) {
                 $newCollection->append($item);
             }
@@ -220,7 +220,7 @@ class Collection implements CollectionInterface
     public function filter(callable $fn): ReadableCollectionInterface
     {
         $newCollection = $this->newCollection([]);
-        foreach($this as $item) {
+        foreach ($this as $item) {
             if ($fn($item) === true) {
                 $newCollection->append($item);
             }
@@ -256,13 +256,13 @@ class Collection implements CollectionInterface
     public function groupByKey(string $key): ReadableCollectionInterface
     {
         $list = [];
-        foreach($this->items as $item) {
+        foreach ($this->items as $item) {
             $index = $item->getValueByKey($key);
             $list[$index][] = $item;
         }
 
         $collection = new Collection();
-        foreach($list as $index => $itemsList) {
+        foreach ($list as $index => $itemsList) {
             $group = new GroupCollection($key, $index, ...$itemsList);
             $collection->append($group);
         }
@@ -277,13 +277,13 @@ class Collection implements CollectionInterface
     public function group(string $key, callable $fnCalcKeyValue): ReadableCollectionInterface
     {
         $list = [];
-        foreach($this->items as $item) {
+        foreach ($this->items as $item) {
             $index = $fnCalcKeyValue($item);
             $list[$index][] = $item;
         }
 
         $collection = new Collection();
-        foreach($list as $index => $itemsList) {
+        foreach ($list as $index => $itemsList) {
             $group = new GroupCollection($key, $index, ...$itemsList);
             $collection->append($group);
         }
@@ -305,7 +305,7 @@ class Collection implements CollectionInterface
     public function jsonSerialize(): array
     {
         $result = [];
-        foreach($this as $item) {
+        foreach ($this as $item) {
             $result[] = $item->jsonSerialize();
         }
 

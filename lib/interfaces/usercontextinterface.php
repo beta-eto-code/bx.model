@@ -17,6 +17,19 @@ interface UserContextInterface
     public function getUserId(): int;
 
     /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getParam(string $key);
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function setParam(string $key, $value): void;
+
+    /**
      * @param int $operationId
      * @param string $scope
      * @return bool
