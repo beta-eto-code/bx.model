@@ -374,4 +374,20 @@ class FetcherModel implements FetcherModelInterface
             $this->fillAsSingleValue($collection);
         }
     }
+
+    /**
+     * @return QueryInterface
+     */
+    public function getQuery(): QueryInterface
+    {
+        return $this->query;
+    }
+
+    /**
+     * @param QueryInterface $query
+     */
+    public function setQuery(QueryInterface $query): void
+    {
+        $this->query = $query;
+    }
 }

@@ -74,6 +74,10 @@ class QueryModel extends Query implements ModelQueryInterface
             $params['runtime'] = $this->runtimeFields;
         }
 
+        if ($this->fetchList) {
+            $params['fetch'] = $this->fetchList;
+        }
+
         return $this->modelService->getList($params, $this->userContext);
     }
 
@@ -87,7 +91,7 @@ class QueryModel extends Query implements ModelQueryInterface
         $this->runtimeFields[$fieldName] = $expression;
         return $this;
     }
-    
+
     /**
      * @return Field[]
      */
