@@ -382,4 +382,12 @@ class FetcherModel implements FetcherModelInterface
     {
         return $this->query;
     }
+
+    /**
+     * @param QueryInterface $query
+     */
+    public function setQuery(QueryInterface $query): void
+    {
+        $this->query = $query;
+    }
 }
