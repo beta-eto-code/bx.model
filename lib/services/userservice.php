@@ -184,16 +184,26 @@ class UserService extends BaseModelService implements UserServiceInterface
      */
     public function findUserIdByLoginPassword(string $login, string $password): int
     {
-        $userData = UserTable::getRow([
-            'filter' => [
-                '=LOGIN' => $login
-            ],
-            'select' => [
-                'ID',
-                'PASSWORD'
-            ],
-            'limit' => 1,
-        ]);
+        if (method_exists('\Bitrix\Main\ORM\Query\Query', 'enablePrivateFields')) {
+            $q = UserTable::query()
+                ->enablePrivateFields()
+                ->addFilter('=LOGIN', $login)
+                ->setSelect(['ID', 'PASSWORD'])
+                ->setLimit(1);
+            $rq = $q->exec();
+            $userData = $rq->fetch();
+        } else {
+            $userData = UserTable::getRow([
+                'filter' => [
+                    '=LOGIN' => $login
+                ],
+                'select' => [
+                    'ID',
+                    'PASSWORD'
+                ],
+                'limit' => 1,
+            ]);
+        }
 
         if (empty($userData)) {
             return 0;
