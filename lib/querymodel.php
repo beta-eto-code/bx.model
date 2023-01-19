@@ -74,8 +74,8 @@ class QueryModel extends Query implements ModelQueryInterface
             $params['runtime'] = $this->runtimeFields;
         }
 
-        if ($this->fetchList) {
-            $params['fetch'] = $this->fetchList;
+        if (!empty($this->group)) {
+            $params['group'] = $this->group;
         }
 
         return $this->modelService->getList($params, $this->userContext);
