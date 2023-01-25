@@ -298,13 +298,7 @@ class FileService extends BaseModelService implements FileServiceInterface
     {
         $fileDataList = [];
         foreach ($files as $file) {
-            $data = [
-                'name' => $file->getClientFilename(),
-                'size' => $file->getSize(),
-                'tmp_name' => $file->getStream()->getMetadata('uri'),
-                'type' => $file->getClientMediaType(),
-                'MODULE_ID' => 'bx.model',
-            ];
+            $data = $this->makeDataForSaveFile($file);
 
             $fileDataList[] = $data;
         }
@@ -314,5 +308,16 @@ class FileService extends BaseModelService implements FileServiceInterface
         }
 
         return $this->internalSaveFiles($baseDir, ...$fileDataList);
+    }
+
+    public function makeDataForSaveFile(UploadedFileInterface $file): array
+    {
+        return [
+            'name' => $file->getClientFilename(),
+            'size' => $file->getSize(),
+            'tmp_name' => $file->getStream()->getMetadata('uri'),
+            'type' => $file->getClientMediaType(),
+            'MODULE_ID' => 'bx.model',
+        ];
     }
 }

@@ -36,4 +36,6 @@ interface FileServiceInterface extends ModelServiceInterface
      * @return void
      */
     public function resizeImage(File $image, int $width, int $height, ?int $mode = null);
+
+    public function makeDataForSaveFile(UploadedFileInterface $file): array;
 }
