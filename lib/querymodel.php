@@ -136,6 +136,10 @@ class QueryModel extends Query implements ModelQueryInterface
             $params['runtime'] = $this->runtimeFields;
         }
 
+        if (!empty($this->group)) {
+            $params['group'] = $this->group;
+        }
+
         return $this->modelService->getCount($params, $this->userContext);
     }
 
