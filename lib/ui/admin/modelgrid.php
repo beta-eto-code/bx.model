@@ -703,4 +703,12 @@ class ModelGrid
 
     }
 
+    /**
+     * @return CAdminUiList
+     */
+    public function getUiList()
+    {
+        return $this->grid;
+    }
+
 }
