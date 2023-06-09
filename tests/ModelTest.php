@@ -112,7 +112,7 @@ class ModelTest extends TestCase
             'key1' => 'value1',
             'key2' => 'value2',
             'key3' => null,
-            'date' => "2021-09-07T16:10:00+00:00",
+            'date' => $this->originalData['date']->format('c'),
             'boolean' => true,
         ];
         $this->assertEquals($this->model->jsonSerialize(), $assertValue);
@@ -139,7 +139,7 @@ class ModelTest extends TestCase
             'key1' => 'value1',
             'key2' => 'value2',
             'key3' => null,
-            'date' => "2021-09-07T16:10:00+00:00",
+            'date' => $this->originalData['date']->format('c'),
             'boolean' => true,
         ];
         $this->assertEquals($this->model->getApiModel(), $assertValue);

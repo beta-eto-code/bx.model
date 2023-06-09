@@ -3,6 +3,7 @@
 
 namespace Bx\Model\Traits;
 
+use Bx\Model\Helper\SortRuleParser;
 
 trait SortableHelper
 {
@@ -15,11 +16,7 @@ trait SortableHelper
     public function allowForSort(string $fieldName): bool
     {
         $sortFields = static::getSortFields();
-        $keys = array_map(function ($value) {
-            return (string)$value;
-        }, array_keys($sortFields));
-
-        return in_array($fieldName, $sortFields) || in_array($fieldName, $keys);
+        return SortRuleParser::allowForSort($fieldName, $sortFields);
     }
 
     /**
@@ -29,17 +26,6 @@ trait SortableHelper
     public function getSort(array $params): array
     {
         $sortFields = static::getSortFields();
-        $fieldSort = $params['field_sort'] ?? null;
-        $orderSort = strtolower($params['order_sort'] ?? '') === 'desc' ? 'desc' : 'asc';
-
-        if (!empty($fieldSort) && static::allowForSort($fieldSort)) {
-            if (isset($sortFields[$fieldSort])) {
-                $fieldSort = $sortFields[$fieldSort];
-            }
-
-            return [$fieldSort => $orderSort];
-        }
-
-        return [];
+        return SortRuleParser::getParsedSort($params, $sortFields);
     }
 }
