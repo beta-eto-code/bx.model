@@ -229,7 +229,7 @@ class ModelGrid
             } else {
                 $this->sortList[] = $sort;
             }
-        } else {
+        } elseif ($sort !== false) {
             $sort = $id;
             $this->sortList[] = $sort;
         }
@@ -528,7 +528,7 @@ class ModelGrid
             $headers[] = [
                 'id' => $column->id,
                 'content' => $column->title,
-                'sort' => $column->id,
+                'sort' => $column->sort !== false ? $column->id : false,
                 'default' => $column->isDefault,
             ];
         }

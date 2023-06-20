@@ -25,11 +25,17 @@ abstract class BaseGridColumn
      */
     public $isDefault;
 
+    /**
+     * @param string $id
+     * @param string $title
+     * @param string|null|false $sort false - отключить сортировку, null - сортировка по полю столбца
+     * @param bool $isDefault
+     */
     public function __construct(string $id, string $title, $sort = null, bool $isDefault = true)
     {
         $this->id = $id;
         $this->title = $title;
-        $this->sort = $sort ?? $id;
+        $this->sort = $sort || $sort === false ? $sort: $id;
         $this->isDefault = $isDefault;
     }
 
