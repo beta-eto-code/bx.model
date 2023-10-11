@@ -54,7 +54,7 @@ abstract class BaseModelService implements ModelServiceInterface
         }
 
         if (!empty($sort)) {
-            $params['sort'] = $sort;
+            $params['order'] = $sort;
         }
 
         if (!empty($limit)) {
