@@ -9,7 +9,7 @@ use Bx\Model\Models\User;
 class UserContext implements UserContextInterface
 {
     private User $user;
-    private ?AccessStrategyInterface $accessStrategy;
+    private ?AccessStrategyInterface $accessStrategy = null;
     private array $params;
 
     public function __construct(User $user, array $params = [])
