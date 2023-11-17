@@ -2,6 +2,7 @@
 
 namespace Bx\Model\Helper;
 
+use Bitrix\Main\Type\Date;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -76,12 +77,14 @@ class FilterParser
             $postValue
         ] = static::parseFilterKey($key);
 
-        if (static::isFilterDate($key)) {
-            $value = new ExtendedDate($value, 'Y-m-d');
-            $key = str_replace('date_', '', $key);
-        } elseif (static::isFilterDateTime($key)) {
-            $value = new ExtendedDateTime($value, 'Y-m-d\TH:i:s\Z');
-            $key = str_replace('datetime_', '', $key);
+        if ($value instanceof Date) {
+            if (static::isFilterDate($key)) {
+                $value = new ExtendedDate($value->format('Y-m-d'), 'Y-m-d');
+                $key = str_replace('date_', '', $key);
+            } elseif (static::isFilterDateTime($key)) {
+                $value = new ExtendedDateTime($value->format('Y-m-d\TH:i:s\Z'), 'Y-m-d\TH:i:s\Z');
+                $key = str_replace('datetime_', '', $key);
+            }
         }
 
         $isStrict = static::isStrictFilter($key);
@@ -160,7 +163,7 @@ class FilterParser
     {
         return [
             '%',
-           str_replace('like_', '', $key),
+            str_replace('like_', '', $key),
             ''
         ];
     }
@@ -174,7 +177,7 @@ class FilterParser
     {
         return [
             '',
-           str_replace('flike_', '', $key),
+            str_replace('flike_', '', $key),
             '%'
         ];
     }

@@ -277,16 +277,20 @@ class FetcherModel implements FetcherModelInterface
                 }
             }
 
-            if (!empty($class)) {
-                $resultCollection = new ModelCollection($resultList, $class);
-                if ($hasModifyCallback) {
-                    $resultCollection = ($this->modifyCallback)($resultCollection);
-                }
-
-                $model[$this->keySave] = !empty($this->classCast) ?
-                    $this->classCast::init($resultCollection) :
-                    $resultCollection;
+            if (empty($class)) {
+                $class = AbsOptimizedModel::class;
             }
+
+            $resultCollection = new ModelCollection($resultList, $class);
+            if ($hasModifyCallback) {
+                $resultCollection = ($this->modifyCallback)($resultCollection);
+            }
+
+            $model[$this->keySave] = !empty($this->classCast) ?
+                $this->classCast::init($resultCollection) :
+                $resultCollection;
+
+            unset($class);
         }
     }
 
