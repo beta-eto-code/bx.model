@@ -77,10 +77,10 @@ class FilterParser
         ] = static::parseFilterKey($key);
 
         if (static::isFilterDate($key)) {
-            $value = new ExtendedDate($value, 'Y-m-d');
+            $value = new ExtendedDate($value->format('Y-m-d'), 'Y-m-d');
             $key = str_replace('date_', '', $key);
         } elseif (static::isFilterDateTime($key)) {
-            $value = new ExtendedDateTime($value, 'Y-m-d\TH:i:s\Z');
+            $value = new ExtendedDateTime($value->format('Y-m-d\TH:i:s\Z'), 'Y-m-d\TH:i:s\Z');
             $key = str_replace('datetime_', '', $key);
         }
 
