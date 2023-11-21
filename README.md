@@ -750,6 +750,18 @@ $grid->setSingleAction('Перейти', 'redirect')
     ->setJs('location.href="/bitrix/admin/product_detail.php?id=#id#"');
 
 /**
+ * Указываем действия над элементами с условием отображения:
+ * если callback возвращает false, то действие на элементе не отобразится
+ */
+$grid->setConditionalSingleAction('Удалить', 'delete')
+    ->setShowConditionCallback(function (ExtendedCatalogProduct $model) {
+        return !$model->hasValueKey('skuList') || empty($model->getValueByKey('skuList'));
+    })
+    ->setCallback(function (int $id) use ($productService) {
+        $productService->delete($id);
+    });
+
+/**
  * Указываем действия над группой элементов
  */
 $grid->setGroupAction('Удалить', 'delete')
