@@ -20,6 +20,7 @@ use Bx\Model\UI\AdminButtonAction;
 use Bx\Model\UI\AdminButtonLink;
 use Bx\Model\UI\BaseAdminButton;
 use Bx\Model\UI\BaseGridColumn;
+use Bx\Model\UI\ConditionalSingleAction;
 use Bx\Model\UI\Fields\BaseFilterField;
 use Bx\Model\UI\Fields\BooleanFilterField;
 use Bx\Model\UI\Fields\DateFilterField;
@@ -376,23 +377,34 @@ class ModelGrid
     /**
      * @param string $title
      * @param string $action
-     * @param string $class
+     * @param string $cssClass
      * @return GroupAction
      */
-    public function setGroupAction(string $title, string $action, string $class = ''): GroupAction
+    public function setGroupAction(string $title, string $action, string $cssClass = ''): GroupAction
     {
-        return $this->groupActions[$action] = new GroupAction($this->actionHelper, $title, $action, $class);
+        return $this->groupActions[$action] = new GroupAction($this->actionHelper, $title, $action, $cssClass);
     }
 
     /**
      * @param string $title
      * @param string $action
-     * @param string $class
+     * @param string $cssClass
      * @return SingleAction
      */
-    public function setSingleAction(string $title, string $action, string $class = ''): SingleAction
+    public function setSingleAction(string $title, string $action, string $cssClass = ''): SingleAction
     {
-        return $this->singleActions[$action] = new SingleAction($this->actionHelper, $title, $action, $class);
+        return $this->singleActions[$action] = new SingleAction($this->actionHelper, $title, $action, $cssClass);
+    }
+
+    /**
+     * @param string $title
+     * @param string $action
+     * @param string $cssClass
+     * @return ConditionalSingleAction
+     */
+    public function setConditionalSingleAction(string $title, string $action, string $cssClass = ''): ConditionalSingleAction
+    {
+        return $this->singleActions[$action] = new ConditionalSingleAction($this->actionHelper, $title, $cssClass);
     }
 
     /**
@@ -556,6 +568,9 @@ class ModelGrid
         $separator = ['SEPARATOR' => true];
         $actions = [];
         foreach ($this->singleActions as $action) {
+            if ($action instanceof ConditionalSingleAction && !$action->isActionAllowedForModel($model)) {
+                continue;
+            }
             $actions[] = $separator;
             $actions[] = $action->toArray((int)$model[$this->primaryKey]);
         }
