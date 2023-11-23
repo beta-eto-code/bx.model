@@ -189,7 +189,7 @@ class ModelGrid
      */
     public function setConditionalSingleAction(string $title, string $action, string $cssClass = ''): ConditionalSingleAction
     {
-        return $this->singleActions[$action] = new ConditionalSingleAction($this->gridActions, $title, $cssClass);
+        return $this->singleActions[$action] = new ConditionalSingleAction($this->gridActions, $title, $action, $cssClass);
     }
 
     public function show()
