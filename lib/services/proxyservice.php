@@ -120,8 +120,14 @@ class ProxyService implements ModelServiceInterface
         return SortRuleParser::getParsedSort($params, $sortFields);
     }
 
-    public function getModelCollection(string $class, array $filter = null, array $sort = null, int $limit = null): ModelCollectionInterface
-    {
-        return $this->originalService->getModelCollection($class, $filter, $sort, $limit);
+    public function getModelCollection(
+        string $class,
+        array $filter = null,
+        array $sort = null,
+        int $limit = null,
+        int $offset = null,
+        ?array $runtime = null
+    ): ModelCollectionInterface {
+        return $this->originalService->getModelCollection($class, $filter, $sort, $limit, $offset, $runtime);
     }
 }

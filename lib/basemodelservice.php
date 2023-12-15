@@ -44,9 +44,18 @@ abstract class BaseModelService implements ModelServiceInterface
      * @param array|null $filter
      * @param array|null $sort
      * @param integer|null $limit
+     * @param int|null $offset
+     * @param array|null $runtime
      * @return ModelCollectionInterface
      */
-    public function getModelCollection(string $class, array $filter = null, array $sort = null, int $limit = null): ModelCollectionInterface
+    public function getModelCollection(
+        string $class,
+        array $filter = null,
+        array $sort = null,
+        int $limit = null,
+        int $offset = null,
+        ?array $runtime = null
+    ): ModelCollectionInterface
     {
         $params = [];
         if (!empty($filter)) {
@@ -59,6 +68,14 @@ abstract class BaseModelService implements ModelServiceInterface
 
         if (!empty($limit)) {
             $params['limit'] = $limit;
+        }
+
+        if (!empty($offset)) {
+            $params['offset'] = $offset;
+        }
+
+        if (!empty($runtime)) {
+            $params['runtime'] = $runtime;
         }
 
         $select = $class::getSelect();
