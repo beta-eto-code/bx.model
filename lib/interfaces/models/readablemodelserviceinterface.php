@@ -40,7 +40,16 @@ interface ReadableModelServiceInterface
      * @param array|null $filter
      * @param array|null $sort
      * @param int|null $limit
-     * @return DerivativeModelInterface[]|ModelCollectionInterface
+     * @param int|null $offset
+     * @param array|null $runtime
+     * @return DerivativeModelInterface|ModelCollectionInterface
      */
-    public function getModelCollection(string $class, array $filter = null, array $sort = null, int $limit = null): ModelCollectionInterface;
+    public function getModelCollection(
+        string $class,
+        array $filter = null,
+        array $sort = null,
+        int $limit = null,
+        int $offset = null,
+        ?array $runtime = null
+    ): ModelCollectionInterface;
 }

@@ -4,6 +4,7 @@ namespace Bx\Model;
 
 use Bx\Model\Interfaces\FetcherModelInterface;
 use Bx\Model\Interfaces\ModelCollectionInterface;
+use Bx\Model\Interfaces\ModelQueryInterface;
 use Bx\Model\Interfaces\Models\ReadableModelServiceInterface;
 use Bx\Model\Interfaces\AggregateModelInterface;
 use Bx\Model\Interfaces\DerivativeModelInterface;
@@ -175,6 +176,12 @@ class FetcherModel implements FetcherModelInterface
             if ($this->query->hasFetchList()) {
                 $params['fetch'] = $this->query->getFetchList();
             }
+
+            if ($this->query instanceof ModelQueryInterface && !empty($this->query->getRuntimeFields())) {
+                $params['runtime'] = $this->query->getRuntimeFields();
+            }
+
+            $params['offset'] = $this->query->getOffset();
         }
 
         if (!empty($this->loadAsClass)) {
@@ -185,7 +192,9 @@ class FetcherModel implements FetcherModelInterface
                 $this->loadAsClass,
                 $params['filter'] ?? null,
                 $params['order'] ?? null,
-                $params['limit'] ?? null
+                $params['limit'] ?? null,
+                $params['offset'] ?: null,
+                $params['runtime'] ?? null
             );
 
             /**
