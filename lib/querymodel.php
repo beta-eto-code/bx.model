@@ -140,6 +140,10 @@ class QueryModel extends Query implements ModelQueryInterface
             $params['group'] = $this->group;
         }
 
+        if (!empty($this->select)) {
+            $params['select'] = $this->select;
+        }
+
         return $this->modelService->getCount($params, $this->userContext);
     }
 
