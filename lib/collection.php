@@ -185,8 +185,11 @@ class Collection implements CollectionInterface
         $result = [];
         $isCallable = $fnModifier !== null;
         foreach ($this as $item) {
-            $value = $item->hasValueKey($key) ? $item->getValueByKey($key) : null;
-            $result[$value] = $isCallable ? $fnModifier($value) : $value;
+            $resultKey = $value = $item->hasValueKey($key) ? $item->getValueByKey($key) : null;
+            if (!is_scalar($resultKey)) {
+                $resultKey = md5(json_encode($value));
+            }
+            $result[$resultKey] = $isCallable ? $fnModifier($value) : $value;
         }
 
         return array_values($result);
