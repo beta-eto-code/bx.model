@@ -526,7 +526,7 @@ class ModelGrid
         if ($this->collection instanceof ModelCollection) {
             return $this->collection;
         }
-
+        $this->preparePoxyModelService();
         return $this->collection = $this->getQuery()->getList();
     }
 
@@ -647,12 +647,14 @@ class ModelGrid
 
         $action = $this->request->getPost('action');
         $type = $this->request->getPost('type');
+        $isActionProcessed = false;
         if ($type === 'group') {
             $groupAction = $this->groupActions[$action] ?? null;
             if ($groupAction instanceof GroupAction) {
                 $ids = (array)($this->request->getPost('id') ?? []);
                 try {
                     $groupAction->exec($ids);
+                    $isActionProcessed = true;
                 }
                 catch (\Throwable $e) {
                     $this->grid->AddGroupError($e->getMessage());
@@ -664,11 +666,16 @@ class ModelGrid
                 $id = (int)$this->request->getPost('id');
                 try {
                     $singleAction->exec($id);
+                    $isActionProcessed = true;
                 }
                 catch (\Throwable $e) {
                     $this->grid->AddUpdateError($e->getMessage(), $id);
                 }
             }
+        }
+
+        if ($isActionProcessed) {
+            $this->collection = null;
         }
     }
 
@@ -678,7 +685,6 @@ class ModelGrid
     public function show()
     {
         $this->processActions();
-        $this->preparePoxyModelService();
         $this->fillHeaders();
         $this->fillGrid();
         $this->fillAdminButtons();

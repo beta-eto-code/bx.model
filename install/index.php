@@ -14,8 +14,8 @@ class bx_model extends CModule
 
     public function __construct()
     {
-        $this->MODULE_VERSION = "1.25.2";
-        $this->MODULE_VERSION_DATE = "2021-12-26 13:20:00";
+        $this->MODULE_VERSION = "1.25.4";
+        $this->MODULE_VERSION_DATE = "2024-03-25 12:50:00";
         $this->MODULE_NAME = "Bitrix model";
         $this->MODULE_DESCRIPTION = "";
     }
