@@ -526,7 +526,7 @@ class ModelGrid
         if ($this->collection instanceof ModelCollection) {
             return $this->collection;
         }
-
+        $this->preparePoxyModelService();
         return $this->collection = $this->getQuery()->getList();
     }
 
@@ -549,13 +549,17 @@ class ModelGrid
 
     private function preparePoxyModelService()
     {
-        $this->modelService->setSortFields($this->sortList);
-
-        $filterData = [];
-        foreach ($this->filterFields as $field) {
-            $filterData = array_merge($filterData, (array)$field->getFilterData());
+        if (!empty($this->sortList)) {
+            $this->modelService->setSortFields($this->sortList);
         }
-        $this->modelService->setFilterFields($filterData);
+
+        if (!empty($this->filterFields)) {
+            $filterData = [];
+            foreach ($this->filterFields as $field) {
+                $filterData = array_merge($filterData, (array)$field->getFilterData());
+            }
+            $this->modelService->setFilterFields($filterData);
+        }
     }
 
     /**
@@ -647,12 +651,14 @@ class ModelGrid
 
         $action = $this->request->getPost('action');
         $type = $this->request->getPost('type');
+        $isActionProcessed = false;
         if ($type === 'group') {
             $groupAction = $this->groupActions[$action] ?? null;
             if ($groupAction instanceof GroupAction) {
                 $ids = (array)($this->request->getPost('id') ?? []);
                 try {
                     $groupAction->exec($ids);
+                    $isActionProcessed = true;
                 }
                 catch (\Throwable $e) {
                     $this->grid->AddGroupError($e->getMessage());
@@ -664,11 +670,16 @@ class ModelGrid
                 $id = (int)$this->request->getPost('id');
                 try {
                     $singleAction->exec($id);
+                    $isActionProcessed = true;
                 }
                 catch (\Throwable $e) {
                     $this->grid->AddUpdateError($e->getMessage(), $id);
                 }
             }
+        }
+
+        if ($isActionProcessed) {
+            $this->collection = null;
         }
     }
 
@@ -678,7 +689,6 @@ class ModelGrid
     public function show()
     {
         $this->processActions();
-        $this->preparePoxyModelService();
         $this->fillHeaders();
         $this->fillGrid();
         $this->fillAdminButtons();
