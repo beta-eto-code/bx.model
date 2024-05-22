@@ -151,7 +151,7 @@ class UserService extends BaseModelService implements UserServiceInterface
      * @param array $data
      * @return Result
      */
-    private function saveUserData(User $model, array $data): Result
+    protected function saveUserData(User $model, array $data): Result
     {
         $result = new Result();
         $cUser = new CUser();
