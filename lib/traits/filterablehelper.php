@@ -28,6 +28,16 @@ trait FilterableHelper
     public function getFilter(array $params): array
     {
         $filterFields = static::getFilterFields();
-        return FilterParser::getParsedFilter($params, $filterFields);
+        $logicOrFields = static::getFilterFieldsWithOrLogic();
+        return FilterParser::getParsedFilter($params, $filterFields, $logicOrFields);
+    }
+
+    /**
+     * Массив групп свойств для фильтрации, которые надо объединять в logic or
+     * @return array[]
+     */
+    protected static function getFilterFieldsWithOrLogic(): array
+    {
+        return [];
     }
 }

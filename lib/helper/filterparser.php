@@ -19,13 +19,16 @@ class FilterParser
     /**
      * @param array<string,mixed> $filterData
      * @param array $allowedFields
+     * @param array $logicOrFields
      * @return array
      * @throws Exception
      */
-    public static function getParsedFilter(array $filterData, array $allowedFields): array
+    public static function getParsedFilter(array $filterData, array $allowedFields, array $logicOrFields = []): array
     {
         $result = [];
+        $resultWithOrLogic = [];
         foreach ($filterData as $key => $value) {
+            $defaultKey = $key;
             /**
              * @psalm-suppress DocblockTypeContradiction
              */
@@ -53,11 +56,28 @@ class FilterParser
                 $value = count($valueList) > 1 ? $valueList : $value;
             }
 
-            $result[$prefix.$key] = !is_array($value) ?
+            $value = !is_array($value) ?
                 $value.$postValue :
-                array_map(function($v) use ($postValue) {
+                array_map(static function($v) use ($postValue) {
                     return $v.$postValue;
                 }, $value);
+
+            $logicGroupFieldIndex = static::findLogicOrFieldsGroupIndex($logicOrFields, $defaultKey);
+            if ($logicGroupFieldIndex !== null) {
+                $resultWithOrLogic[$logicGroupFieldIndex][] = [$prefix.$key => $value];
+            } else {
+                $result[$prefix.$key] = $value;
+            }
+        }
+
+        if (!empty($resultWithOrLogic)) {
+            foreach ($resultWithOrLogic as $oneLogicGroup) {
+                if (count($oneLogicGroup) > 1) {
+                    $oneLogicGroup['LOGIC'] = 'OR';
+                }
+
+                $result[] = $oneLogicGroup;
+            }
         }
 
         return $result;
@@ -204,5 +224,16 @@ class FilterParser
         }, array_keys($allowedFields));
 
         return in_array($fieldName, $allowedFields) || in_array($fieldName, $keys);
+    }
+
+    private static function findLogicOrFieldsGroupIndex(array $array, string $property): ?int
+    {
+        foreach ($array as $index => $subArray) {
+            if (in_array($property, $subArray, true)) {
+                return $index;
+            }
+        }
+
+        return null;
     }
 }
