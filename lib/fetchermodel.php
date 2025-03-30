@@ -251,34 +251,43 @@ class FetcherModel implements FetcherModelInterface
         }
 
         $listKeyValues = array_unique($listKeyValues);
+        $isCallableCallback = $this->compareCallback !== null;
         $hasModifyCallback = $this->modifyCallback !== null;
+        $hasClassCast = !empty($this->classCast);
+
         $linkedCollection = $this->getLinkedCollection($listKeyValues);
+        if (!$isCallableCallback) {
+            $linkedModelListsByKeys = $this->getLinkedCollectionIndexedByValue($linkedCollection, true);
+        }
+
         foreach ($collection as $model) {
             $originalValue = (array)($model[$this->foreignKey] ?? []);
             if (empty($originalValue)) {
                 continue;
             }
 
-            $isCallableCallback = $this->compareCallback !== null;
             $resultList = [];
-            foreach ($linkedCollection as $linkedModel) {
-                $likedValue = $linkedModel[$this->linkedModelKey] ?? null;
-                /**
-                 * @psalm-suppress RedundantCondition
-                 */
-                if (
-                    ($isCallableCallback && ($this->compareCallback)($model, $linkedModel)) ||
-                    (!empty($likedValue) && is_array($originalValue) && in_array($likedValue, $originalValue))
-                ) {
-                    $resultList[] = $linkedModel;
-                    if (empty($class)) {
-                        $class = get_class($linkedModel);
+            if ($isCallableCallback) {
+                foreach ($linkedCollection as $linkedModel) {
+                    if (($this->compareCallback)($model, $linkedModel)) {
+                        $resultList[] = $linkedModel;
+                    }
+                }
+            } else {
+                foreach ($originalValue as $foreignKeyValue) {
+                    if (isset($linkedModelListsByKeys[$foreignKeyValue])) {
+                        $resultList = array_merge($resultList, $linkedModelListsByKeys[$foreignKeyValue]);
                     }
                 }
             }
 
             if (empty($class)) {
-                $class = AbsOptimizedModel::class;
+                $linkedModel = current($resultList);
+                if ($linkedModel !== false) {
+                    $class = get_class($linkedModel);
+                } else {
+                    $class = AbsOptimizedModel::class;
+                }
             }
 
             $resultCollection = new ModelCollection($resultList, $class);
@@ -286,7 +295,7 @@ class FetcherModel implements FetcherModelInterface
                 $resultCollection = ($this->modifyCallback)($resultCollection);
             }
 
-            $model[$this->keySave] = !empty($this->classCast) ?
+            $model[$this->keySave] = $hasClassCast ?
                 $this->classCast::init($resultCollection) :
                 $resultCollection;
 
@@ -344,27 +353,51 @@ class FetcherModel implements FetcherModelInterface
         }
 
         $isCallableCallback = $this->compareCallback !== null;
-        $linkedCollection = $this->getLinkedCollection($listKeyValues);
         $hasModifyCallback = $this->modifyCallback !== null;
+
+        $linkedCollection = $this->getLinkedCollection($listKeyValues);
+        if (!$isCallableCallback) {
+            $linkedModelsByKeys = $this->getLinkedCollectionIndexedByValue($linkedCollection, false);
+        }
+
         foreach ($collection as $model) {
             $originalValue = $model[$this->foreignKey] ?? null;
             if (empty($originalValue)) {
                 continue;
             }
 
-            foreach ($linkedCollection as $linkedModel) {
-                $likedValue = $linkedModel[$this->linkedModelKey] ?? null;
-                if ($isCallableCallback) {
+            if ($isCallableCallback) {
+                foreach ($linkedCollection as $linkedModel) {
                     if (($this->compareCallback)($model, $linkedModel)) {
                         $model[$this->keySave] = $hasModifyCallback ?
                             ($this->modifyCallback)($linkedModel) :
                             $linkedModel;
                     }
-                } elseif (!empty($likedValue) && $originalValue == $likedValue) {
+                }
+            } else {
+                if (isset($linkedModelsByKeys[$originalValue])) {
+                    $linkedModel = $linkedModelsByKeys[$originalValue];
                     $model[$this->keySave] = $hasModifyCallback ? ($this->modifyCallback)($linkedModel) : $linkedModel;
                 }
             }
         }
+    }
+
+    private function getLinkedCollectionIndexedByValue(ModelCollection $linkedCollection, bool $isMultipleMode): array
+    {
+        $indexedCollection = [];
+        foreach ($linkedCollection as $linkedModel) {
+            $linkedValue = $linkedModel[$this->linkedModelKey] ?? null;
+            if ($linkedValue !== null) {
+                if ($isMultipleMode) {
+                    $indexedCollection[$linkedValue][] = $linkedModel;
+                } else {
+                    $indexedCollection[$linkedValue] = $linkedModel;
+                }
+            }
+        }
+
+        return $indexedCollection;
     }
 
     /**
