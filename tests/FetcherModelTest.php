@@ -371,5 +371,21 @@ class FetcherModelTest extends TestCase
         $this->fetcherModel->fill($collection);
 
         $this->assertEquals(json_encode($assertValue), json_encode($collection));
+
+        $invalidList = [
+            [
+                'id' => 1,
+                'model_id' => [23], //массив, вместо int или string для варианта с одним значением по ключу
+            ],
+        ];
+        $collection = $this->initCollection($invalidList);
+        $fetcher = FetcherModel::initAsSingleValue(
+            $this->linkedService,
+            'externalModel',
+            'model_id',
+            'id'
+        );
+
+        $fetcher->fill($collection); //не должно выдавать ошибку, должно пропустить некорректный ключ
     }
 }

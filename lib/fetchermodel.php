@@ -275,6 +275,7 @@ class FetcherModel implements FetcherModelInterface
                 }
             } else {
                 foreach ($originalValue as $foreignKeyValue) {
+                    $foreignKeyValue = (string)$foreignKeyValue;
                     if (isset($linkedModelListsByKeys[$foreignKeyValue])) {
                         $resultList = array_merge($resultList, $linkedModelListsByKeys[$foreignKeyValue]);
                     }
@@ -362,7 +363,7 @@ class FetcherModel implements FetcherModelInterface
 
         foreach ($collection as $model) {
             $originalValue = $model[$this->foreignKey] ?? null;
-            if (empty($originalValue)) {
+            if ($originalValue === null) {
                 continue;
             }
 
@@ -375,6 +376,7 @@ class FetcherModel implements FetcherModelInterface
                     }
                 }
             } else {
+                $originalValue = (string)$originalValue;
                 if (isset($linkedModelsByKeys[$originalValue])) {
                     $linkedModel = $linkedModelsByKeys[$originalValue];
                     $model[$this->keySave] = $hasModifyCallback ? ($this->modifyCallback)($linkedModel) : $linkedModel;
@@ -387,7 +389,7 @@ class FetcherModel implements FetcherModelInterface
     {
         $indexedCollection = [];
         foreach ($linkedCollection as $linkedModel) {
-            $linkedValue = $linkedModel[$this->linkedModelKey] ?? null;
+            $linkedValue = isset($linkedModel[$this->linkedModelKey]) ? (string)$linkedModel[$this->linkedModelKey] : null;
             if ($linkedValue !== null) {
                 if ($isMultipleMode) {
                     $indexedCollection[$linkedValue][] = $linkedModel;
