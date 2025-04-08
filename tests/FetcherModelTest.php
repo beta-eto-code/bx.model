@@ -387,5 +387,52 @@ class FetcherModelTest extends TestCase
         );
 
         $fetcher->fill($collection); //не должно выдавать ошибку, должно пропустить некорректный ключ
+
+        $listWithInvalidModelIdType = [
+            [
+                'id' => 1,
+                'model_id' => '21.0000', //строка, приводимая к int
+            ],
+            [
+                'id' => 2,
+                'model_id' => 22.0000, //float, приводимый к int
+            ],
+            [
+                'id' => 3,
+                'model_id' => '23.005', //строка, приводимая к float, но не к int
+            ],
+        ];
+        $assertValueWithValidTypes = [
+            [
+                'id' => 1,
+                'model_id' => '21.0000',
+                'externalModel' => [
+                    'id' => 21,
+                    'title' => 'model 21',
+                ],
+            ],
+            [
+                'id' => 2,
+                'model_id' => 22.0000,
+                'externalModel' => [
+                    'id' => 22,
+                    'title' => 'model 22',
+                ],
+            ],
+            [
+                'id' => 3,
+                'model_id' => '23.005',
+            ],
+        ];
+        $collection = $this->initCollection($listWithInvalidModelIdType);
+        $fetcher = FetcherModel::initAsSingleValue(
+            $this->linkedService,
+            'externalModel',
+            'model_id',
+            'id'
+        );
+
+        $fetcher->fill($collection);
+        $this->assertEquals(json_encode($assertValueWithValidTypes), json_encode($collection));
     }
 }

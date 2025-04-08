@@ -275,8 +275,8 @@ class FetcherModel implements FetcherModelInterface
                 }
             } else {
                 foreach ($originalValue as $foreignKeyValue) {
-                    $foreignKeyValue = (string)$foreignKeyValue;
-                    if (isset($linkedModelListsByKeys[$foreignKeyValue])) {
+                    $foreignKeyValue = $this->getValueAsArrayKey($foreignKeyValue);
+                    if ($foreignKeyValue !== null && isset($linkedModelListsByKeys[$foreignKeyValue])) {
                         $resultList = array_merge($resultList, $linkedModelListsByKeys[$foreignKeyValue]);
                     }
                 }
@@ -376,8 +376,8 @@ class FetcherModel implements FetcherModelInterface
                     }
                 }
             } else {
-                $originalValue = (string)$originalValue;
-                if (isset($linkedModelsByKeys[$originalValue])) {
+                $originalValue = $this->getValueAsArrayKey($originalValue);
+                if ($originalValue !== null && isset($linkedModelsByKeys[$originalValue])) {
                     $linkedModel = $linkedModelsByKeys[$originalValue];
                     $model[$this->keySave] = $hasModifyCallback ? ($this->modifyCallback)($linkedModel) : $linkedModel;
                 }
@@ -389,7 +389,9 @@ class FetcherModel implements FetcherModelInterface
     {
         $indexedCollection = [];
         foreach ($linkedCollection as $linkedModel) {
-            $linkedValue = isset($linkedModel[$this->linkedModelKey]) ? (string)$linkedModel[$this->linkedModelKey] : null;
+            $linkedValue = isset($linkedModel[$this->linkedModelKey]) ?
+                $this->getValueAsArrayKey($linkedModel[$this->linkedModelKey]) :
+                null;
             if ($linkedValue !== null) {
                 if ($isMultipleMode) {
                     $indexedCollection[$linkedValue][] = $linkedModel;
@@ -400,6 +402,36 @@ class FetcherModel implements FetcherModelInterface
         }
 
         return $indexedCollection;
+    }
+
+    /**
+     * @param mixed $value
+     * @return int|string|null
+     */
+    private function getValueAsArrayKey($value)
+    {
+        if (is_string($value)) {
+            if (is_numeric($value)) {
+                $value = +$value;
+            } else {
+                return $value;
+            }
+        }
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_float($value)) {
+            $intValue = (int)$value;
+            return $value == $intValue ? $intValue : null;
+        }
+
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return $value->__toString();
+        }
+
+        return null;
     }
 
     /**
