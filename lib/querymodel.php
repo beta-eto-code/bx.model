@@ -56,26 +56,35 @@ class QueryModel extends Query implements ModelQueryInterface
      */
     public function getList(): ModelCollection
     {
-        $params = [
-            'filter' => $this->filter ?? [],
-            'order' => $this->sort ?? [],
-        ];
+        $params = [];
 
-        if ($this->limit > 0) {
+        if ($this->hasFilter()) {
+            $params['filter'] = $this->filter;
+        }
+
+        if ($this->hasSort()) {
+            $params['order'] = $this->sort;
+        }
+
+        if ($this->hasLimit()) {
             $params['limit'] = $this->limit;
             $params['offset'] = $this->getOffset();
         }
 
-        if (!empty($this->select)) {
+        if ($this->hasSelect()) {
             $params['select'] = $this->select;
         }
 
-        if (!empty($this->runtimeFields)) {
+        if ($this->hasRuntimeFields()) {
             $params['runtime'] = $this->runtimeFields;
         }
 
-        if (!empty($this->group)) {
+        if ($this->hasGroup()) {
             $params['group'] = $this->group;
+        }
+
+        if ($this->hasFetchList()) {
+            $params['fetch'] = $this->fetchList;
         }
 
         return $this->modelService->getList($params, $this->userContext);
@@ -98,6 +107,11 @@ class QueryModel extends Query implements ModelQueryInterface
     public function getRuntimeFields(): array
     {
         return (array)($this->runtimeFields ?? []);
+    }
+
+    public function hasRuntimeFields(): bool
+    {
+        return !empty($this->runtimeFields);
     }
 
     /**
@@ -128,19 +142,21 @@ class QueryModel extends Query implements ModelQueryInterface
             return $this->totalCount;
         }
 
-        $params = !empty($this->filter) ? [
-            'filter' => $this->filter
-        ] : [];
+        $params = [];
 
-        if (!empty($this->runtimeFields)) {
+        if ($this->hasFilter()) {
+            $params['filter'] = $this->filter;
+        }
+
+        if ($this->hasRuntimeFields()) {
             $params['runtime'] = $this->runtimeFields;
         }
 
-        if (!empty($this->group)) {
+        if ($this->hasGroup()) {
             $params['group'] = $this->group;
         }
 
-        if (!empty($this->select)) {
+        if ($this->hasSelect()) {
             $params['select'] = $this->select;
         }
 
