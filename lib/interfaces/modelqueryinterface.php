@@ -15,7 +15,7 @@ interface ModelQueryInterface extends QueryInterface
      * @param array $params
      * @return $this
      */
-    public function loadFiler(array $params): self;
+    public function loadFilter(array $params): self;
 
     /**
      * Формируем условие сортировки из переданных данных
